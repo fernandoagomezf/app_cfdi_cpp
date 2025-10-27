@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "chrono": "cpp",
-        "xutility": "cpp"
+        "xutility": "cpp",
+        "xstring": "cpp",
+        "xtree": "cpp"
     }
 }

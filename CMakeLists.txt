@@ -14,6 +14,7 @@ find_package(Boost REQUIRED COMPONENTS uuid)
 
 add_library(CFDILib STATIC
     src/document.cpp
+    src/xmlnode.cpp
     src/xmlreader.cpp
 )
 target_include_directories(CFDILib PUBLIC include)
