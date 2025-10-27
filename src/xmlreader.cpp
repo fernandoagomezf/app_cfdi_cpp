@@ -2,6 +2,7 @@
 #include "xmltextparser.hpp"
 #include "xmlcommentparser.hpp"
 #include "xmlcdataparser.hpp"
+#include "xmlprocessinginstructionparser.hpp"
 #include <sstream>
 #include <stdexcept>
 #include <cctype>
@@ -19,6 +20,7 @@ using cfdi::XmlCDataParser;
 using cfdi::XmlCommentParser;
 using cfdi::XmlNodeType;
 using cfdi::XmlNode;
+using cfdi::XmlProcessingInstructionParser;
 using cfdi::XmlReader;
 using cfdi::XmlTextParser;
 
@@ -229,34 +231,12 @@ void XmlReader::parseCDATA() {
 }
 
 void XmlReader::parseProcessingInstruction() {
-    string target = { readName() };
+    XmlProcessingInstructionParser parser { };
+    XmlNode node { parser.parse(_buffer) };
     
-    if (target.empty()) {
-        throw runtime_error("Invalid processing instruction target");
-    }
-
-    _buffer.skipWhiteSpace();
-
-    string data { };
-    bool foundEnd { false };
-
-    while (_buffer.canRead()) {
-        auto c = _buffer.read();
-        
-        if (c == '?' && _buffer.canRead() && _buffer.peek() == '>') {
-            _buffer.read(); // consume '>'
-            foundEnd = true;
-            break;
-        } else {
-            data += c;
-        }
-    }
-
-    if (!foundEnd) {
-        throw runtime_error("Unclosed processing instruction");
-    }
-
-    setNodeInfo(XmlNodeType::ProcessingInstruction, target, data);
+    _nodeType = node.nodeType;
+    _name = node.name;
+    _value = node.value;
 }
 
 void XmlReader::parseXmlDeclaration() {

@@ -7,9 +7,9 @@ using cfdi::XmlBuffer;
 using cfdi::XmlFragmentParser;
 using cfdi::XmlNode;
 using cfdi::XmlNodeType;
-using cfdi::XmlProcessingInstruction;
+using cfdi::XmlProcessingInstructionParser;
 
-XmlNode XmlProcessingInstruction::parse(XmlBuffer& buffer) {
+XmlNode XmlProcessingInstructionParser::parse(XmlBuffer& buffer) {
     string target = { parseName(buffer) };
     
     if (target.empty()) {

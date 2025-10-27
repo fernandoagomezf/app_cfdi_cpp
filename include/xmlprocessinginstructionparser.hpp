@@ -10,7 +10,7 @@ namespace cfdi {
     using cfdi::XmlFragmentParser;
     using cfdi::XmlNode;
 
-    class XmlProcessingInstruction : public XmlFragmentParser {
+    class XmlProcessingInstructionParser : public XmlFragmentParser {
         public:
             virtual XmlNode parse(XmlBuffer& buffer) final;
     };
