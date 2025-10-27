@@ -19,10 +19,7 @@ namespace cfdi {
     using cfdi::XmlNode;
 
     class XmlReader {
-        public:
-            static unique_ptr<XmlReader> create(string_view xml);
-            static unique_ptr<XmlReader> create(istream& stream);
-            
+        public:            
             XmlReader(string_view xml);
             XmlReader(istream& stream);
             virtual ~XmlReader() = default;
@@ -30,41 +27,29 @@ namespace cfdi {
             bool read();
             XmlNode current() const;
 
-            XmlNodeType nodeType() const;
-            string_view name() const;
-            string_view localName() const;
-            string_view prefix() const;
-            string_view value() const;
-            int depth() const;
-            bool isEmptyElement() const;
-            int getAttributeCount() const;
-            bool hasAttributes() const;
-            string_view getAttribute(string_view name) const;
-            const map<string, string>& getAttributes() const;
-            bool eof() const;
-
         private:
             
 
-            bool ReadInternal();
-            void SkipWhitespace();
-            bool IsWhitespace(char c) const;
-            char PeekChar();
-            char ReadChar();
-            bool CanRead() const;
-            void ParseElement();
-            void ParseEndElement();
-            void ParseText();
-            void ParseComment();
-            void ParseCDATA();
-            void ParseProcessingInstruction();
-            void ParseXmlDeclaration();
-            void ParseDocumentType();
-            void ParseAttributes();
-            string ReadName();
-            string ReadAttributeValue();
-            void SetNodeInfo(XmlNodeType type, const string& name, const string& value);
-            void SplitQualifiedName(const string& qualifiedName, string& prefix, string& localName);
+            bool readInternal();
+            void skipWhitespace();
+            bool isWhitespace(char c) const;
+            char peekChar();
+            char readChar();
+            void consumeChar();
+            bool canRead() const;
+            void parseElement();
+            void parseEndElement();
+            void parseText();
+            void parseComment();
+            void parseCDATA();
+            void parseProcessingInstruction();
+            void parseXmlDeclaration();
+            void parseDocumentType();
+            void parseAttributes();
+            string readName();
+            string readAttributeValue();
+            void setNodeInfo(XmlNodeType type, const string& name, const string& value);
+            void splitQualifiedName(const string& qualifiedName, string& prefix, string& localName);
 
             string _xml;
             size_t _position;

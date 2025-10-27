@@ -3,8 +3,12 @@
 #include <stdexcept>
 #include <cctype>
 
+using std::isalnum;
+using std::isalpha;
 using std::map;
 using std::ostringstream;
+using std::runtime_error;
+using std::stoi;
 using std::string;
 using std::string_view;
 using std::unique_ptr;
@@ -39,15 +43,6 @@ XmlReader::XmlReader(istream& stream)
     _eof = _xml.empty();
 }
 
-
-unique_ptr<XmlReader> XmlReader::create(string_view xml) {
-    return unique_ptr<XmlReader>(new XmlReader(xml));
-}
-
-unique_ptr<XmlReader> XmlReader::create(istream& stream) {
-    return unique_ptr<XmlReader>(new XmlReader(stream));
-}
-
 bool XmlReader::read() {
     if (_eof) {
         return false;
@@ -60,7 +55,9 @@ bool XmlReader::read() {
     _prefix.clear();
     _value.clear();
 
-    return ReadInternal();
+    auto result { readInternal() };
+
+    return result;
 }
 
 XmlNode XmlReader::current() const {
@@ -77,170 +74,123 @@ XmlNode XmlReader::current() const {
     };
 }
 
-XmlNodeType XmlReader::nodeType() const {
-    return _nodeType;
+bool XmlReader::canRead() const {
+    return _position < _xml.length();
 }
 
-string_view XmlReader::name() const {
-    return _name;
-}
-
-string_view XmlReader::localName() const {
-    return _localName;
-}
-
-string_view XmlReader::prefix() const {
-    return _prefix;
-}
-
-string_view XmlReader::value() const {
-    return _value;
-}
-
-int XmlReader::depth() const {
-    return _depth;
-}
-
-bool XmlReader::isEmptyElement() const {
-    return _isEmptyElement;
-}
-
-int XmlReader::getAttributeCount() const {
-    return static_cast<int>(_attributes.size());
-}
-
-bool XmlReader::hasAttributes() const {
-    return !_attributes.empty();
-}
-
-string_view XmlReader::getAttribute(string_view name) const {
-    auto it = _attributes.find(string(name));
-    if (it != _attributes.end()) {
-        return it->second;
+char XmlReader::peekChar() {
+    auto ch = '\0';
+    if (_position < _xml.length()) {
+        ch = _xml[_position];
     }
-    return "";
+    return ch;
 }
 
-const map<string, string>& XmlReader::getAttributes() const {
-    return _attributes;
+char XmlReader::readChar() {
+    auto ch = '\0';
+    if (_position < _xml.length()) {
+        ch = _xml[_position];
+        ++_position;
+    }
+    return ch;
 }
 
-bool XmlReader::eof() const {
-    return _eof;
+void XmlReader::consumeChar() {
+    if (_position < _xml.length()) {
+        ++_position;
+    }
 }
 
-bool XmlReader::ReadInternal() {
-    SkipWhitespace();
+bool XmlReader::readInternal() {
+    skipWhitespace();
 
-    if (!CanRead()) {
+    if (!canRead()) {
         _eof = true;
         _nodeType = XmlNodeType::None;
         return false;
     }
 
-    char c = PeekChar();
+    auto c = peekChar();
 
     // Check for markup
     if (c == '<') {
-        ReadChar(); // consume '<'
-        
-        if (!CanRead()) {
-            throw std::runtime_error("Unexpected end of XML");
+        readChar(); // consume '<'        
+        if (!canRead()) {
+            throw runtime_error("Unexpected end of XML");
         }
 
-        char next = PeekChar();
-
+        auto next = peekChar();
         if (next == '!') {
-            ReadChar(); // consume '!'
-            
-            if (!CanRead()) {
-                throw std::runtime_error("Unexpected end of XML");
+            readChar(); // consume '!'            
+            if (!canRead()) {
+                throw runtime_error("Unexpected end of XML");
             }
 
-            char third = PeekChar();
-            
+            auto third = peekChar();            
             if (third == '-') {
-                ParseComment();
+                parseComment();
             } else if (third == '[') {
-                ParseCDATA();
+                parseCDATA();
             } else if (third == 'D') {
-                ParseDocumentType();
+                parseDocumentType();
             } else {
-                throw std::runtime_error("Invalid XML syntax");
+                throw runtime_error("Invalid XML syntax");
             }
         } else if (next == '?') {
-            ReadChar(); // consume '?'
+            readChar(); // consume '?'
             
             // Check if it's XML declaration
             if (_position + 3 <= _xml.length() && 
                 _xml.substr(_position, 3) == "xml") {
-                ParseXmlDeclaration();
+                parseXmlDeclaration();
             } else {
-                ParseProcessingInstruction();
+                parseProcessingInstruction();
             }
         } else if (next == '/') {
-            ReadChar(); // consume '/'
-            ParseEndElement();
+            readChar(); // consume '/'
+            parseEndElement();
         } else {
-            ParseElement();
+            parseElement();
         }
 
         return true;
     } else {
         // Text content
-        ParseText();
+        parseText();
         return true;
     }
 }
 
-void XmlReader::SkipWhitespace() {
-    while (CanRead() && IsWhitespace(PeekChar())) {
-        ReadChar();
+void XmlReader::skipWhitespace() {
+    while (canRead() && isWhitespace(peekChar())) {
+        readChar();
     }
 }
 
-bool XmlReader::IsWhitespace(char c) const {
+bool XmlReader::isWhitespace(char c) const {
     return c == ' ' || c == '\t' || c == '\n' || c == '\r';
 }
 
-char XmlReader::PeekChar() {
-    if (_position < _xml.length()) {
-        return _xml[_position];
-    }
-    return '\0';
-}
 
-char XmlReader::ReadChar() {
-    if (_position < _xml.length()) {
-        return _xml[_position++];
-    }
-    return '\0';
-}
-
-bool XmlReader::CanRead() const {
-    return _position < _xml.length();
-}
-
-void XmlReader::ParseElement() {
-    string name = ReadName();
+void XmlReader::parseElement() {
+    string name = readName();
     
     if (name.empty()) {
         throw std::runtime_error("Invalid element name");
     }
 
     // Parse attributes
-    ParseAttributes();
-
-    SkipWhitespace();
+    parseAttributes();
+    skipWhitespace();
 
     // Check for empty element
-    if (CanRead() && PeekChar() == '/') {
-        ReadChar(); // consume '/'
+    if (canRead() && peekChar() == '/') {
+        readChar(); // consume '/'
         _isEmptyElement = true;
     }
 
     // Expect closing '>'
-    if (!CanRead() || ReadChar() != '>') {
+    if (!canRead() || readChar() != '>') {
         throw std::runtime_error("Expected '>' to close element tag");
     }
 
@@ -248,26 +198,26 @@ void XmlReader::ParseElement() {
         _depth++;
     }
 
-    string prefix, localName;
-    SplitQualifiedName(name, prefix, localName);
-    
-    SetNodeInfo(XmlNodeType::Element, name, "");
+    string prefix { };
+    string localName { };
+    splitQualifiedName(name, prefix, localName);    
+    setNodeInfo(XmlNodeType::Element, name, "");
     _prefix = prefix;
     _localName = localName;
 }
 
-void XmlReader::ParseEndElement() {
-    string name = ReadName();
+void XmlReader::parseEndElement() {
+    string name = readName();
     
     if (name.empty()) {
-        throw std::runtime_error("Invalid end element name");
+        throw runtime_error("Invalid end element name");
     }
 
-    SkipWhitespace();
+    skipWhitespace();
 
     // Expect closing '>'
-    if (!CanRead() || ReadChar() != '>') {
-        throw std::runtime_error("Expected '>' to close end element tag");
+    if (!canRead() || readChar() != '>') {
+        throw runtime_error("Expected '>' to close end element tag");
     }
 
     _depth--;
@@ -275,28 +225,28 @@ void XmlReader::ParseEndElement() {
         _depth = 0;
     }
 
-    string prefix, localName;
-    SplitQualifiedName(name, prefix, localName);
-    
-    SetNodeInfo(XmlNodeType::EndElement, name, "");
+    string prefix { };
+    string localName { };
+    splitQualifiedName(name, prefix, localName);    
+    setNodeInfo(XmlNodeType::EndElement, name, "");
     _prefix = prefix;
     _localName = localName;
 }
 
-void XmlReader::ParseText() {
+void XmlReader::parseText() {
     string text;
     
-    while (CanRead() && PeekChar() != '<') {
-        char c = ReadChar();
+    while (canRead() && peekChar() != '<') {
+        char c = readChar();
         
         // Handle entity references
         if (c == '&') {
             string entity;
-            while (CanRead() && PeekChar() != ';') {
-                entity += ReadChar();
+            while (canRead() && peekChar() != ';') {
+                entity += readChar();
             }
-            if (CanRead()) {
-                ReadChar(); // consume ';'
+            if (canRead()) {
+                readChar(); // consume ';'
             }
             
             // Decode common entities
@@ -315,10 +265,10 @@ void XmlReader::ParseText() {
                 int code = 0;
                 if (entity.length() > 1 && entity[1] == 'x') {
                     // Hexadecimal
-                    code = std::stoi(entity.substr(2), nullptr, 16);
+                    code = stoi(entity.substr(2), nullptr, 16);
                 } else {
                     // Decimal
-                    code = std::stoi(entity.substr(1));
+                    code = stoi(entity.substr(1));
                 }
                 text += static_cast<char>(code);
             } else {
@@ -332,36 +282,35 @@ void XmlReader::ParseText() {
     // Check if it's all whitespace
     bool allWhitespace = true;
     for (char c : text) {
-        if (!IsWhitespace(c)) {
+        if (!isWhitespace(c)) {
             allWhitespace = false;
             break;
         }
     }
 
     if (allWhitespace && !text.empty()) {
-        SetNodeInfo(XmlNodeType::Whitespace, "", text);
+        setNodeInfo(XmlNodeType::Whitespace, "", text);
     } else {
-        SetNodeInfo(XmlNodeType::Text, "", text);
+        setNodeInfo(XmlNodeType::Text, "", text);
     }
 }
 
-void XmlReader::ParseComment() {
+void XmlReader::parseComment() {
     // Expect "<!--"
-    if (ReadChar() != '-' || !CanRead() || ReadChar() != '-') {
-        throw std::runtime_error("Invalid comment syntax");
+    if (readChar() != '-' || !canRead() || readChar() != '-') {
+        throw runtime_error("Invalid comment syntax");
     }
 
-    string comment;
-    bool foundEnd = false;
+    string comment { };
+    bool foundEnd { false };
 
-    while (CanRead()) {
-        char c = ReadChar();
-        
-        if (c == '-' && CanRead() && PeekChar() == '-') {
-            ReadChar(); // consume second '-'
+    while (canRead()) {
+        auto c = readChar();        
+        if (c == '-' && canRead() && peekChar() == '-') {
+            readChar(); // consume second '-'
             
-            if (CanRead() && PeekChar() == '>') {
-                ReadChar(); // consume '>'
+            if (canRead() && peekChar() == '>') {
+                readChar(); // consume '>'
                 foundEnd = true;
                 break;
             } else {
@@ -373,32 +322,31 @@ void XmlReader::ParseComment() {
     }
 
     if (!foundEnd) {
-        throw std::runtime_error("Unclosed comment");
+        throw runtime_error("Unclosed comment");
     }
 
-    SetNodeInfo(XmlNodeType::Comment, "", comment);
+    setNodeInfo(XmlNodeType::Comment, "", comment);
 }
 
-void XmlReader::ParseCDATA() {
+void XmlReader::parseCDATA() {
     // Expect "<![CDATA["
     string expected = "[CDATA[";
     for (char expectedChar : expected) {
-        if (!CanRead() || ReadChar() != expectedChar) {
-            throw std::runtime_error("Invalid CDATA syntax");
+        if (!canRead() || readChar() != expectedChar) {
+            throw runtime_error("Invalid CDATA syntax");
         }
     }
 
-    string cdata;
-    bool foundEnd = false;
+    string cdata { };
+    bool foundEnd { false };
 
-    while (CanRead()) {
-        char c = ReadChar();
-        
-        if (c == ']' && CanRead() && PeekChar() == ']') {
-            ReadChar(); // consume second ']'
+    while (canRead()) {
+        auto c = readChar();        
+        if (c == ']' && canRead() && peekChar() == ']') {
+            readChar(); // consume second ']'
             
-            if (CanRead() && PeekChar() == '>') {
-                ReadChar(); // consume '>'
+            if (canRead() && peekChar() == '>') {
+                readChar(); // consume '>'
                 foundEnd = true;
                 break;
             } else {
@@ -410,29 +358,29 @@ void XmlReader::ParseCDATA() {
     }
 
     if (!foundEnd) {
-        throw std::runtime_error("Unclosed CDATA section");
+        throw runtime_error("Unclosed CDATA section");
     }
 
-    SetNodeInfo(XmlNodeType::CDATA, "", cdata);
+    setNodeInfo(XmlNodeType::CDATA, "", cdata);
 }
 
-void XmlReader::ParseProcessingInstruction() {
-    string target = ReadName();
+void XmlReader::parseProcessingInstruction() {
+    string target = { readName() };
     
     if (target.empty()) {
-        throw std::runtime_error("Invalid processing instruction target");
+        throw runtime_error("Invalid processing instruction target");
     }
 
-    SkipWhitespace();
+    skipWhitespace();
 
-    string data;
-    bool foundEnd = false;
+    string data { };
+    bool foundEnd { false };
 
-    while (CanRead()) {
-        char c = ReadChar();
+    while (canRead()) {
+        auto c = readChar();
         
-        if (c == '?' && CanRead() && PeekChar() == '>') {
-            ReadChar(); // consume '>'
+        if (c == '?' && canRead() && peekChar() == '>') {
+            readChar(); // consume '>'
             foundEnd = true;
             break;
         } else {
@@ -441,45 +389,43 @@ void XmlReader::ParseProcessingInstruction() {
     }
 
     if (!foundEnd) {
-        throw std::runtime_error("Unclosed processing instruction");
+        throw runtime_error("Unclosed processing instruction");
     }
 
-    SetNodeInfo(XmlNodeType::ProcessingInstruction, target, data);
+    setNodeInfo(XmlNodeType::ProcessingInstruction, target, data);
 }
 
-void XmlReader::ParseXmlDeclaration() {
+void XmlReader::parseXmlDeclaration() {
     // We're already past "<?xml"
     _position += 3; // skip "xml"
 
     // Parse attributes (version, encoding, standalone)
-    ParseAttributes();
-
-    SkipWhitespace();
+    parseAttributes();
+    skipWhitespace();
 
     // Expect "?>"
-    if (!CanRead() || ReadChar() != '?' || !CanRead() || ReadChar() != '>') {
-        throw std::runtime_error("Invalid XML declaration syntax");
+    if (!canRead() || readChar() != '?' || !canRead() || readChar() != '>') {
+        throw runtime_error("Invalid XML declaration syntax");
     }
 
-    SetNodeInfo(XmlNodeType::XmlDeclaration, "xml", "");
+    setNodeInfo(XmlNodeType::XmlDeclaration, "xml", "");
 }
 
-void XmlReader::ParseDocumentType() {
+void XmlReader::parseDocumentType() {
     // Expect "<!DOCTYPE"
     string doctype = "DOCTYPE";
     for (char c : doctype) {
-        if (!CanRead() || ReadChar() != c) {
-            throw std::runtime_error("Invalid DOCTYPE syntax");
+        if (!canRead() || readChar() != c) {
+            throw runtime_error("Invalid DOCTYPE syntax");
         }
     }
 
-    string dtd;
-    int bracketDepth = 0;
-    bool foundEnd = false;
+    string dtd { };
+    int bracketDepth { 0 };
+    bool foundEnd = { false };
 
-    while (CanRead()) {
-        char c = ReadChar();
-        
+    while (canRead()) {
+        auto c = readChar();        
         if (c == '[') {
             bracketDepth++;
             dtd += c;
@@ -495,19 +441,19 @@ void XmlReader::ParseDocumentType() {
     }
 
     if (!foundEnd) {
-        throw std::runtime_error("Unclosed DOCTYPE");
+        throw runtime_error("Unclosed DOCTYPE");
     }
 
-    SetNodeInfo(XmlNodeType::DocumentType, "DOCTYPE", dtd);
+    setNodeInfo(XmlNodeType::DocumentType, "DOCTYPE", dtd);
 }
 
-void XmlReader::ParseAttributes() {
+void XmlReader::parseAttributes() {
     _attributes.clear();
 
-    while (CanRead()) {
-        SkipWhitespace();
+    while (canRead()) {
+        skipWhitespace();
 
-        char c = PeekChar();
+        auto c = peekChar();
         
         // Check for end of tag
         if (c == '>' || c == '/' || c == '?') {
@@ -515,49 +461,47 @@ void XmlReader::ParseAttributes() {
         }
 
         // Read attribute name
-        string attrName = ReadName();
-        
+        string attrName { readName() };        
         if (attrName.empty()) {
             break;
         }
 
-        SkipWhitespace();
+        skipWhitespace();
 
         // Expect '='
-        if (!CanRead() || ReadChar() != '=') {
-            throw std::runtime_error("Expected '=' after attribute name");
+        if (!canRead() || readChar() != '=') {
+            throw runtime_error("Expected '=' after attribute name");
         }
 
-        SkipWhitespace();
+        skipWhitespace();
 
         // Read attribute value
-        string attrValue = ReadAttributeValue();
+        string attrValue = readAttributeValue();
 
         _attributes[attrName] = attrValue;
     }
 }
 
-string XmlReader::ReadName() {
-    string name;
-
-    if (!CanRead()) {
+string XmlReader::readName() {
+    string name { };
+    if (!canRead()) {
         return name;
     }
 
-    char c = PeekChar();
+    char c = peekChar();
     
     // XML name must start with letter, underscore, or colon
-    if (!std::isalpha(static_cast<unsigned char>(c)) && c != '_' && c != ':') {
+    if (!isalpha(static_cast<unsigned char>(c)) && c != '_' && c != ':') {
         return name;
     }
 
-    while (CanRead()) {
-        c = PeekChar();
+    while (canRead()) {
+        c = peekChar();
         
         // Valid name characters
-        if (std::isalnum(static_cast<unsigned char>(c)) || 
+        if (isalnum(static_cast<unsigned char>(c)) || 
             c == '_' || c == ':' || c == '-' || c == '.') {
-            name += ReadChar();
+            name += readChar();
         } else {
             break;
         }
@@ -566,32 +510,29 @@ string XmlReader::ReadName() {
     return name;
 }
 
-string XmlReader::ReadAttributeValue() {
-    if (!CanRead()) {
-        throw std::runtime_error("Expected attribute value");
+string XmlReader::readAttributeValue() {
+    if (!canRead()) {
+        throw runtime_error("Expected attribute value");
     }
 
-    char quote = ReadChar();
-    
+    char quote = readChar();    
     if (quote != '"' && quote != '\'') {
-        throw std::runtime_error("Attribute value must be quoted");
+        throw runtime_error("Attribute value must be quoted");
     }
 
-    string value;
-
-    while (CanRead()) {
-        char c = ReadChar();
-        
+    string value { };
+    while (canRead()) {
+        auto c = readChar();        
         if (c == quote) {
             break;
         } else if (c == '&') {
             // Handle entity references
-            string entity;
-            while (CanRead() && PeekChar() != ';') {
-                entity += ReadChar();
+            string entity { };
+            while (canRead() && peekChar() != ';') {
+                entity += readChar();
             }
-            if (CanRead()) {
-                ReadChar(); // consume ';'
+            if (canRead()) {
+                readChar(); // consume ';'
             }
             
             // Decode common entities
@@ -607,13 +548,13 @@ string XmlReader::ReadAttributeValue() {
                 value += '\'';
             } else if (!entity.empty() && entity[0] == '#') {
                 // Numeric character reference
-                int code = 0;
+                int code { 0 };
                 if (entity.length() > 1 && entity[1] == 'x') {
                     // Hexadecimal
-                    code = std::stoi(entity.substr(2), nullptr, 16);
+                    code = stoi(entity.substr(2), nullptr, 16);
                 } else {
                     // Decimal
-                    code = std::stoi(entity.substr(1));
+                    code = stoi(entity.substr(1));
                 }
                 value += static_cast<char>(code);
             } else {
@@ -627,13 +568,13 @@ string XmlReader::ReadAttributeValue() {
     return value;
 }
 
-void XmlReader::SetNodeInfo(XmlNodeType type, const string& name, const string& value) {
+void XmlReader::setNodeInfo(XmlNodeType type, const string& name, const string& value) {
     _nodeType = type;
     _name = name;
     _value = value;
 }
 
-void XmlReader::SplitQualifiedName(const string& qualifiedName, string& prefix, string& localName) {
+void XmlReader::splitQualifiedName(const string& qualifiedName, string& prefix, string& localName) {
     size_t colonPos = qualifiedName.find(':');
     
     if (colonPos != string::npos) {
