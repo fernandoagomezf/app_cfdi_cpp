@@ -1,6 +1,7 @@
 #include "xmlreader.hpp"
 #include "xmltextparser.hpp"
 #include "xmlcommentparser.hpp"
+#include "xmlcdataparser.hpp"
 #include <sstream>
 #include <stdexcept>
 #include <cctype>
@@ -14,6 +15,7 @@ using std::stoi;
 using std::string;
 using std::string_view;
 using std::unique_ptr;
+using cfdi::XmlCDataParser;
 using cfdi::XmlCommentParser;
 using cfdi::XmlNodeType;
 using cfdi::XmlNode;
@@ -204,7 +206,7 @@ void XmlReader::parseText() {
     XmlNode node { parser.parse(_buffer) };
     
     _nodeType = node.nodeType;
-    _name = "";
+    _name = node.name;
     _value = node.value;
 }
 
@@ -213,44 +215,17 @@ void XmlReader::parseComment() {
     XmlNode node { parser.parse(_buffer) };
 
     _nodeType = node.nodeType;
-    _name = "";
+    _name = node.name;
     _value = node.value;
 }
 
 void XmlReader::parseCDATA() {
-    // Expect "<![CDATA["
-    string expected = "[CDATA[";
-    for (char expectedChar : expected) {
-        if (!_buffer.canRead() || _buffer.read() != expectedChar) {
-            throw runtime_error("Invalid CDATA syntax");
-        }
-    }
+    XmlCDataParser parser { };
+    XmlNode node { parser.parse(_buffer) };
 
-    string cdata { };
-    bool foundEnd { false };
-
-    while (_buffer.canRead()) {
-        auto c = _buffer.read();        
-        if (c == ']' && _buffer.canRead() && _buffer.peek() == ']') {
-            _buffer.read(); // consume second ']'
-            
-            if (_buffer.canRead() && _buffer.peek() == '>') {
-                _buffer.read(); // consume '>'
-                foundEnd = true;
-                break;
-            } else {
-                cdata += "]]";
-            }
-        } else {
-            cdata += c;
-        }
-    }
-
-    if (!foundEnd) {
-        throw runtime_error("Unclosed CDATA section");
-    }
-
-    setNodeInfo(XmlNodeType::CDATA, "", cdata);
+    _nodeType = node.nodeType;
+    _name = node.name;
+    _value = node.value;
 }
 
 void XmlReader::parseProcessingInstruction() {
