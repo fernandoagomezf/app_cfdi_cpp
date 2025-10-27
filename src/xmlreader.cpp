@@ -173,7 +173,7 @@ bool XmlReader::isWhitespace(char c) const {
 
 
 void XmlReader::parseElement() {
-    string name = readName();
+    string name { readName() };
     
     if (name.empty()) {
         throw std::runtime_error("Invalid element name");
