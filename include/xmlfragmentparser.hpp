@@ -15,7 +15,7 @@ namespace cfdi {
             virtual XmlNode parse(XmlBuffer& buffer) = 0;
 
         protected:
-            string readName(XmlBuffer& buffer);
+            string parseName(XmlBuffer& buffer);
     };
 }
 

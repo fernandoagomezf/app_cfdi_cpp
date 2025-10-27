@@ -10,7 +10,7 @@ using cfdi::XmlNodeType;
 using cfdi::XmlProcessingInstruction;
 
 XmlNode XmlProcessingInstruction::parse(XmlBuffer& buffer) {
-    string target = { readName(buffer) };
+    string target = { parseName(buffer) };
     
     if (target.empty()) {
         throw runtime_error("Invalid processing instruction target");

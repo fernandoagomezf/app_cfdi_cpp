@@ -7,7 +7,7 @@ using std::isalnum;
 using cfdi::XmlBuffer;
 using cfdi::XmlFragmentParser;
 
-string XmlFragmentParser::readName(XmlBuffer& buffer) {
+string XmlFragmentParser::parseName(XmlBuffer& buffer) {
     string name { };
     if (!buffer.canRead()) {
         return name;
