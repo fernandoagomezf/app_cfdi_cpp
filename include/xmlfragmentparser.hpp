@@ -13,6 +13,9 @@ namespace cfdi {
         public:
             virtual ~XmlFragmentParser() = default;
             virtual XmlNode parse(XmlBuffer& buffer) = 0;
+
+        protected:
+            string readName(XmlBuffer& buffer);
     };
 }
 
