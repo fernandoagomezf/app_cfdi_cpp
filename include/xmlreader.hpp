@@ -23,6 +23,8 @@ namespace cfdi {
             static unique_ptr<XmlReader> create(string_view xml);
             static unique_ptr<XmlReader> create(istream& stream);
             
+            XmlReader(string_view xml);
+            XmlReader(istream& stream);
             virtual ~XmlReader() = default;
 
             bool read();
@@ -42,10 +44,8 @@ namespace cfdi {
             bool eof() const;
 
         private:
-            XmlReader(string_view xml);
-            XmlReader(istream& stream);
+            
 
-            void Initialize();
             bool ReadInternal();
             void SkipWhitespace();
             bool IsWhitespace(char c) const;

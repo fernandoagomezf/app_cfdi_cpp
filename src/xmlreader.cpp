@@ -4,6 +4,7 @@
 #include <cctype>
 
 using std::map;
+using std::ostringstream;
 using std::string;
 using std::string_view;
 using std::unique_ptr;
@@ -11,45 +12,40 @@ using cfdi::XmlNodeType;
 using cfdi::XmlNode;
 using cfdi::XmlReader;
 
-// Static factory methods
+XmlReader::XmlReader(string_view xml)
+    : _xml { xml },
+      _position { 0 },
+      _eof { false },
+      _nodeType { XmlNodeType::None },
+      _depth { 0 },
+      _isEmptyElement { false },
+      _readContent { false }
+{
+    _eof = _xml.empty();
+}
+
+XmlReader::XmlReader(istream& stream)
+    : _xml { },
+      _position { 0 },
+      _eof { false },
+      _nodeType { XmlNodeType::None },
+      _depth { 0 },
+      _isEmptyElement { false },
+      _readContent { false }
+{
+    ostringstream ss;
+    ss << stream.rdbuf();
+    _xml = ss.str();
+    _eof = _xml.empty();
+}
+
+
 unique_ptr<XmlReader> XmlReader::create(string_view xml) {
     return unique_ptr<XmlReader>(new XmlReader(xml));
 }
 
 unique_ptr<XmlReader> XmlReader::create(istream& stream) {
     return unique_ptr<XmlReader>(new XmlReader(stream));
-}
-
-// Constructors
-XmlReader::XmlReader(string_view xml)
-    : _xml(xml)
-    , _position(0)
-    , _eof(false)
-    , _nodeType(XmlNodeType::None)
-    , _depth(0)
-    , _isEmptyElement(false)
-    , _readContent(false)
-{
-    Initialize();
-}
-
-XmlReader::XmlReader(istream& stream)
-    : _position(0)
-    , _eof(false)
-    , _nodeType(XmlNodeType::None)
-    , _depth(0)
-    , _isEmptyElement(false)
-    , _readContent(false)
-{
-    std::ostringstream ss;
-    ss << stream.rdbuf();
-    _xml = ss.str();
-    Initialize();
-}
-
-void XmlReader::Initialize() {
-    _position = 0;
-    _eof = _xml.empty();
 }
 
 bool XmlReader::read() {

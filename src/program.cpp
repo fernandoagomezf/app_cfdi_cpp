@@ -5,9 +5,11 @@
 #include "xmlreader.hpp"
 
 using std::cin;
+using std::ostringstream;
 using std::string;
 using std::ifstream;
 using fmt::print;
+using cfdi::XmlNode;
 using cfdi::XmlNodeType;
 using cfdi::XmlReader;
 
@@ -23,29 +25,15 @@ int main() {
         return -1;
     }
     
-    auto reader = XmlReader::create(file);
+    XmlReader reader { file };
     
-    // Read and display XML structure
-    while (reader->read()) {
-        // Indent based on depth
-        for (int i = 0; i < reader->depth(); i++) {
+    while (reader.read()) {        
+        XmlNode node { reader.current() };
+        for (int i = 0; i < node.depth; i++) {
             print("  ");
         }
         
-        auto node = reader->current(); 
         switch (node.nodeType) {
-            case XmlNodeType::XmlDeclaration:
-                print("XmlDeclaration: {}\n", node.name);
-                if (node.hasAttributes()) {
-                    for (const auto& [name, value] : node.attributes) {
-                        for (int i = 0; i < node.depth + 1; i++) {
-                            print("  ");
-                        } 
-                        print("@{} = \"{}\"\n", name, value);
-                    }
-                }
-                break;
-                
             case XmlNodeType::Element:
                 print("Element: {} (prefix: '{}', localName: '{}')", node.name, node.prefix, node.localName);
                 if (node.isEmpty) {
@@ -71,22 +59,6 @@ int main() {
                 if (!node.value.empty()) {
                     print("Text: \"{}\"\n", node.value);
                 }
-                break;
-                
-            case XmlNodeType::Whitespace:
-                // Skip whitespace nodes in output
-                break;
-                
-            case XmlNodeType::Comment:
-                print("Comment: {}\n", node.value);
-                break;
-                
-            case XmlNodeType::CDATA:
-                print("CDATA: {}\n", node.value);
-                break;
-                
-            case XmlNodeType::ProcessingInstruction:
-                print("ProcessingInstruction: {} = \"{}\"\n", node.name, node.value);
                 break;
                 
             default:
