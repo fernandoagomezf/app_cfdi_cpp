@@ -8,6 +8,7 @@
 #include <istream>
 #include "xmlnodetype.hpp"
 #include "xmlnode.hpp"
+#include "xmlbuffer.hpp"
 
 namespace cfdi {
     using std::string;
@@ -17,6 +18,7 @@ namespace cfdi {
     using std::istream;
     using cfdi::XmlNodeType;
     using cfdi::XmlNode;
+    using cfdi::XmlBuffer;
 
     class XmlReader {
         public:            
@@ -30,13 +32,7 @@ namespace cfdi {
         private:
             
 
-            bool readInternal();
-            void skipWhitespace();
-            bool isWhitespace(char c) const;
-            char peekChar();
-            char readChar();
-            void consumeChar();
-            bool canRead() const;
+            bool readInternal();            
             void parseElement();
             void parseEndElement();
             void parseText();
@@ -51,8 +47,7 @@ namespace cfdi {
             void setNodeInfo(XmlNodeType type, const string& name, const string& value);
             void splitQualifiedName(const string& qualifiedName, string& prefix, string& localName);
 
-            string _xml;
-            size_t _position;
+            XmlBuffer _buffer;
             bool _eof;
             
             XmlNodeType _nodeType;

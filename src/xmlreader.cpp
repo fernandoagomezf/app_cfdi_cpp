@@ -17,20 +17,18 @@ using cfdi::XmlNode;
 using cfdi::XmlReader;
 
 XmlReader::XmlReader(string_view xml)
-    : _xml { xml },
-      _position { 0 },
+    : _buffer { xml, 0 },
       _eof { false },
       _nodeType { XmlNodeType::None },
       _depth { 0 },
       _isEmptyElement { false },
       _readContent { false }
 {
-    _eof = _xml.empty();
+    _eof = xml.empty();
 }
 
 XmlReader::XmlReader(istream& stream)
-    : _xml { },
-      _position { 0 },
+    : _buffer { { }, 0  },
       _eof { false },
       _nodeType { XmlNodeType::None },
       _depth { 0 },
@@ -39,8 +37,9 @@ XmlReader::XmlReader(istream& stream)
 {
     ostringstream ss;
     ss << stream.rdbuf();
-    _xml = ss.str();
-    _eof = _xml.empty();
+    auto str = ss.str();
+    _buffer = { str, 0 };
+    _eof = str.empty();
 }
 
 bool XmlReader::read() {
@@ -74,59 +73,33 @@ XmlNode XmlReader::current() const {
     };
 }
 
-bool XmlReader::canRead() const {
-    return _position < _xml.length();
-}
-
-char XmlReader::peekChar() {
-    auto ch = '\0';
-    if (_position < _xml.length()) {
-        ch = _xml[_position];
-    }
-    return ch;
-}
-
-char XmlReader::readChar() {
-    auto ch = '\0';
-    if (_position < _xml.length()) {
-        ch = _xml[_position];
-        ++_position;
-    }
-    return ch;
-}
-
-void XmlReader::consumeChar() {
-    if (_position < _xml.length()) {
-        ++_position;
-    }
-}
 
 bool XmlReader::readInternal() {
-    skipWhitespace();
+    _buffer.skipWhiteSpace();
 
-    if (!canRead()) {
+    if (!_buffer.canRead()) {
         _eof = true;
         _nodeType = XmlNodeType::None;
         return false;
     }
 
-    auto c = peekChar();
+    auto c = _buffer.peek();
 
     // Check for markup
     if (c == '<') {
-        readChar(); // consume '<'        
-        if (!canRead()) {
+        _buffer.read(); // consume '<'        
+        if (!_buffer.canRead()) {
             throw runtime_error("Unexpected end of XML");
         }
 
-        auto next = peekChar();
+        auto next = _buffer.peek();
         if (next == '!') {
-            readChar(); // consume '!'            
-            if (!canRead()) {
+            _buffer.read(); // consume '!'            
+            if (!_buffer.canRead()) {
                 throw runtime_error("Unexpected end of XML");
             }
 
-            auto third = peekChar();            
+            auto third = _buffer.peek();            
             if (third == '-') {
                 parseComment();
             } else if (third == '[') {
@@ -137,17 +110,17 @@ bool XmlReader::readInternal() {
                 throw runtime_error("Invalid XML syntax");
             }
         } else if (next == '?') {
-            readChar(); // consume '?'
+            _buffer.read(); // consume '?'
             
             // Check if it's XML declaration
-            if (_position + 3 <= _xml.length() && 
-                _xml.substr(_position, 3) == "xml") {
+            if (_buffer.position() + 3 <= _buffer.length() && 
+                _buffer.substr(3) == "xml") {
                 parseXmlDeclaration();
             } else {
                 parseProcessingInstruction();
             }
         } else if (next == '/') {
-            readChar(); // consume '/'
+            _buffer.read(); // consume '/'
             parseEndElement();
         } else {
             parseElement();
@@ -161,17 +134,6 @@ bool XmlReader::readInternal() {
     }
 }
 
-void XmlReader::skipWhitespace() {
-    while (canRead() && isWhitespace(peekChar())) {
-        readChar();
-    }
-}
-
-bool XmlReader::isWhitespace(char c) const {
-    return c == ' ' || c == '\t' || c == '\n' || c == '\r';
-}
-
-
 void XmlReader::parseElement() {
     string name { readName() };
     
@@ -181,16 +143,16 @@ void XmlReader::parseElement() {
 
     // Parse attributes
     parseAttributes();
-    skipWhitespace();
+    _buffer.skipWhiteSpace();
 
     // Check for empty element
-    if (canRead() && peekChar() == '/') {
-        readChar(); // consume '/'
+    if (_buffer.canRead() && _buffer.peek() == '/') {
+        _buffer.read(); // consume '/'
         _isEmptyElement = true;
     }
 
     // Expect closing '>'
-    if (!canRead() || readChar() != '>') {
+    if (!_buffer.canRead() || _buffer.read() != '>') {
         throw std::runtime_error("Expected '>' to close element tag");
     }
 
@@ -213,10 +175,10 @@ void XmlReader::parseEndElement() {
         throw runtime_error("Invalid end element name");
     }
 
-    skipWhitespace();
+    _buffer.skipWhiteSpace();
 
     // Expect closing '>'
-    if (!canRead() || readChar() != '>') {
+    if (!_buffer.canRead() || _buffer.read() != '>') {
         throw runtime_error("Expected '>' to close end element tag");
     }
 
@@ -234,19 +196,19 @@ void XmlReader::parseEndElement() {
 }
 
 void XmlReader::parseText() {
-    string text;
+    string text { };
     
-    while (canRead() && peekChar() != '<') {
-        char c = readChar();
+    while (_buffer.canRead() && _buffer.peek() != '<') {
+        auto c = _buffer.read();
         
         // Handle entity references
         if (c == '&') {
-            string entity;
-            while (canRead() && peekChar() != ';') {
-                entity += readChar();
+            string entity { };
+            while (_buffer.canRead() && _buffer.peek() != ';') {
+                entity += _buffer.read();
             }
-            if (canRead()) {
-                readChar(); // consume ';'
+            if (_buffer.canRead()) {
+                _buffer.read(); // consume ';'
             }
             
             // Decode common entities
@@ -262,7 +224,7 @@ void XmlReader::parseText() {
                 text += '\'';
             } else if (!entity.empty() && entity[0] == '#') {
                 // Numeric character reference
-                int code = 0;
+                int code { 0 };
                 if (entity.length() > 1 && entity[1] == 'x') {
                     // Hexadecimal
                     code = stoi(entity.substr(2), nullptr, 16);
@@ -282,7 +244,7 @@ void XmlReader::parseText() {
     // Check if it's all whitespace
     bool allWhitespace = true;
     for (char c : text) {
-        if (!isWhitespace(c)) {
+        if (!XmlBuffer::isWhiteSpace(c)) {
             allWhitespace = false;
             break;
         }
@@ -297,20 +259,20 @@ void XmlReader::parseText() {
 
 void XmlReader::parseComment() {
     // Expect "<!--"
-    if (readChar() != '-' || !canRead() || readChar() != '-') {
+    if (_buffer.read() != '-' || !_buffer.canRead() || _buffer.read() != '-') {
         throw runtime_error("Invalid comment syntax");
     }
 
     string comment { };
     bool foundEnd { false };
 
-    while (canRead()) {
-        auto c = readChar();        
-        if (c == '-' && canRead() && peekChar() == '-') {
-            readChar(); // consume second '-'
+    while (_buffer.canRead()) {
+        auto c = _buffer.read();        
+        if (c == '-' && _buffer.canRead() && _buffer.peek() == '-') {
+            _buffer.read(); // consume second '-'
             
-            if (canRead() && peekChar() == '>') {
-                readChar(); // consume '>'
+            if (_buffer.canRead() && _buffer.peek() == '>') {
+                _buffer.read(); // consume '>'
                 foundEnd = true;
                 break;
             } else {
@@ -332,7 +294,7 @@ void XmlReader::parseCDATA() {
     // Expect "<![CDATA["
     string expected = "[CDATA[";
     for (char expectedChar : expected) {
-        if (!canRead() || readChar() != expectedChar) {
+        if (!_buffer.canRead() || _buffer.read() != expectedChar) {
             throw runtime_error("Invalid CDATA syntax");
         }
     }
@@ -340,13 +302,13 @@ void XmlReader::parseCDATA() {
     string cdata { };
     bool foundEnd { false };
 
-    while (canRead()) {
-        auto c = readChar();        
-        if (c == ']' && canRead() && peekChar() == ']') {
-            readChar(); // consume second ']'
+    while (_buffer.canRead()) {
+        auto c = _buffer.read();        
+        if (c == ']' && _buffer.canRead() && _buffer.peek() == ']') {
+            _buffer.read(); // consume second ']'
             
-            if (canRead() && peekChar() == '>') {
-                readChar(); // consume '>'
+            if (_buffer.canRead() && _buffer.peek() == '>') {
+                _buffer.read(); // consume '>'
                 foundEnd = true;
                 break;
             } else {
@@ -371,16 +333,16 @@ void XmlReader::parseProcessingInstruction() {
         throw runtime_error("Invalid processing instruction target");
     }
 
-    skipWhitespace();
+    _buffer.skipWhiteSpace();
 
     string data { };
     bool foundEnd { false };
 
-    while (canRead()) {
-        auto c = readChar();
+    while (_buffer.canRead()) {
+        auto c = _buffer.read();
         
-        if (c == '?' && canRead() && peekChar() == '>') {
-            readChar(); // consume '>'
+        if (c == '?' && _buffer.canRead() && _buffer.peek() == '>') {
+            _buffer.read(); // consume '>'
             foundEnd = true;
             break;
         } else {
@@ -396,15 +358,15 @@ void XmlReader::parseProcessingInstruction() {
 }
 
 void XmlReader::parseXmlDeclaration() {
-    // We're already past "<?xml"
-    _position += 3; // skip "xml"
+    // We're already past "<?xml"    
+    _buffer.consume(3);
 
     // Parse attributes (version, encoding, standalone)
     parseAttributes();
-    skipWhitespace();
+    _buffer.skipWhiteSpace();
 
     // Expect "?>"
-    if (!canRead() || readChar() != '?' || !canRead() || readChar() != '>') {
+    if (!_buffer.canRead() || _buffer.read() != '?' || !_buffer.canRead() || _buffer.read() != '>') {
         throw runtime_error("Invalid XML declaration syntax");
     }
 
@@ -415,7 +377,7 @@ void XmlReader::parseDocumentType() {
     // Expect "<!DOCTYPE"
     string doctype = "DOCTYPE";
     for (char c : doctype) {
-        if (!canRead() || readChar() != c) {
+        if (!_buffer.canRead() || _buffer.read() != c) {
             throw runtime_error("Invalid DOCTYPE syntax");
         }
     }
@@ -424,8 +386,8 @@ void XmlReader::parseDocumentType() {
     int bracketDepth { 0 };
     bool foundEnd = { false };
 
-    while (canRead()) {
-        auto c = readChar();        
+    while (_buffer.canRead()) {
+        auto c = _buffer.read();        
         if (c == '[') {
             bracketDepth++;
             dtd += c;
@@ -450,10 +412,10 @@ void XmlReader::parseDocumentType() {
 void XmlReader::parseAttributes() {
     _attributes.clear();
 
-    while (canRead()) {
-        skipWhitespace();
+    while (_buffer.canRead()) {
+        _buffer.skipWhiteSpace();
 
-        auto c = peekChar();
+        auto c = _buffer.peek();
         
         // Check for end of tag
         if (c == '>' || c == '/' || c == '?') {
@@ -466,17 +428,17 @@ void XmlReader::parseAttributes() {
             break;
         }
 
-        skipWhitespace();
+        _buffer.skipWhiteSpace();
 
         // Expect '='
-        if (!canRead() || readChar() != '=') {
+        if (!_buffer.canRead() || _buffer.read() != '=') {
             throw runtime_error("Expected '=' after attribute name");
         }
 
-        skipWhitespace();
+        _buffer.skipWhiteSpace();
 
         // Read attribute value
-        string attrValue = readAttributeValue();
+        string attrValue { readAttributeValue() };
 
         _attributes[attrName] = attrValue;
     }
@@ -484,24 +446,24 @@ void XmlReader::parseAttributes() {
 
 string XmlReader::readName() {
     string name { };
-    if (!canRead()) {
+    if (!_buffer.canRead()) {
         return name;
     }
 
-    char c = peekChar();
+    auto c = _buffer.peek();
     
     // XML name must start with letter, underscore, or colon
     if (!isalpha(static_cast<unsigned char>(c)) && c != '_' && c != ':') {
         return name;
     }
 
-    while (canRead()) {
-        c = peekChar();
+    while (_buffer.canRead()) {
+        c = _buffer.peek();
         
         // Valid name characters
         if (isalnum(static_cast<unsigned char>(c)) || 
             c == '_' || c == ':' || c == '-' || c == '.') {
-            name += readChar();
+            name += _buffer.read();
         } else {
             break;
         }
@@ -511,28 +473,28 @@ string XmlReader::readName() {
 }
 
 string XmlReader::readAttributeValue() {
-    if (!canRead()) {
+    if (!_buffer.canRead()) {
         throw runtime_error("Expected attribute value");
     }
 
-    char quote = readChar();    
+    char quote = _buffer.read();    
     if (quote != '"' && quote != '\'') {
         throw runtime_error("Attribute value must be quoted");
     }
 
     string value { };
-    while (canRead()) {
-        auto c = readChar();        
+    while (_buffer.canRead()) {
+        auto c = _buffer.read();        
         if (c == quote) {
             break;
         } else if (c == '&') {
             // Handle entity references
             string entity { };
-            while (canRead() && peekChar() != ';') {
-                entity += readChar();
+            while (_buffer.canRead() && _buffer.peek() != ';') {
+                entity += _buffer.read();
             }
-            if (canRead()) {
-                readChar(); // consume ';'
+            if (_buffer.canRead()) {
+                _buffer.read(); // consume ';'
             }
             
             // Decode common entities
