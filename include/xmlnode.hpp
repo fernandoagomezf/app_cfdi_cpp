@@ -14,10 +14,10 @@ namespace cfdi {
     
     struct XmlNode {
         XmlNodeType nodeType;
-        string_view name;
-        string_view localName;
-        string_view prefix;
-        string_view value;
+        string name;
+        string localName;
+        string prefix;
+        string value;
         int depth;
         bool isEmpty;
         bool eof;
