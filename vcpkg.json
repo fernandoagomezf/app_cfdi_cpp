@@ -1,1 +1,8 @@
-{}
+{
+    "name": "blendwerk-cfdi",
+    "version": "0.1.0",
+    "dependencies": [
+        "fmt",
+        "boost-uuid"
+    ]
+}
