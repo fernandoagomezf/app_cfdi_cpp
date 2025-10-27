@@ -1,0 +1,6 @@
+# cmake build files
+CMakeUserPresets.json
+
+# build folders
+build/
+build-*/
