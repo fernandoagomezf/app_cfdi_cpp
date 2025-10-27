@@ -17,6 +17,8 @@ add_library(CFDILib STATIC
     src/xmlnode.cpp
     src/xmlreader.cpp
     src/xmlbuffer.cpp
+    src/xmlfragmentparser.cpp
+    src/xmltextparser.cpp
 )
 target_include_directories(CFDILib PUBLIC include)
 target_link_libraries(CFDILib PRIVATE fmt::fmt)

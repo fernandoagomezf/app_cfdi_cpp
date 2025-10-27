@@ -1,4 +1,5 @@
 #include "xmlreader.hpp"
+#include "xmltextparser.hpp"
 #include <sstream>
 #include <stdexcept>
 #include <cctype>
@@ -15,6 +16,7 @@ using std::unique_ptr;
 using cfdi::XmlNodeType;
 using cfdi::XmlNode;
 using cfdi::XmlReader;
+using cfdi::XmlTextParser;
 
 XmlReader::XmlReader(string_view xml)
     : _buffer { xml, 0 },
@@ -196,65 +198,12 @@ void XmlReader::parseEndElement() {
 }
 
 void XmlReader::parseText() {
-    string text { };
+    XmlTextParser parser { };
+    XmlNode node { parser.parse(_buffer) };
     
-    while (_buffer.canRead() && _buffer.peek() != '<') {
-        auto c = _buffer.read();
-        
-        // Handle entity references
-        if (c == '&') {
-            string entity { };
-            while (_buffer.canRead() && _buffer.peek() != ';') {
-                entity += _buffer.read();
-            }
-            if (_buffer.canRead()) {
-                _buffer.read(); // consume ';'
-            }
-            
-            // Decode common entities
-            if (entity == "lt") {
-                text += '<';
-            } else if (entity == "gt") {
-                text += '>';
-            } else if (entity == "amp") {
-                text += '&';
-            } else if (entity == "quot") {
-                text += '"';
-            } else if (entity == "apos") {
-                text += '\'';
-            } else if (!entity.empty() && entity[0] == '#') {
-                // Numeric character reference
-                int code { 0 };
-                if (entity.length() > 1 && entity[1] == 'x') {
-                    // Hexadecimal
-                    code = stoi(entity.substr(2), nullptr, 16);
-                } else {
-                    // Decimal
-                    code = stoi(entity.substr(1));
-                }
-                text += static_cast<char>(code);
-            } else {
-                text += '&' + entity + ';';
-            }
-        } else {
-            text += c;
-        }
-    }
-
-    // Check if it's all whitespace
-    bool allWhitespace = true;
-    for (char c : text) {
-        if (!XmlBuffer::isWhiteSpace(c)) {
-            allWhitespace = false;
-            break;
-        }
-    }
-
-    if (allWhitespace && !text.empty()) {
-        setNodeInfo(XmlNodeType::Whitespace, "", text);
-    } else {
-        setNodeInfo(XmlNodeType::Text, "", text);
-    }
+    _nodeType = node.nodeType;
+    _name = "";
+    _value = node.value;
 }
 
 void XmlReader::parseComment() {
