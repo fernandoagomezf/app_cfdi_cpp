@@ -54,7 +54,7 @@ int main() {
             case XmlNodeType::EndElement:
                 print("EndElement: {}\n", node.name);
                 break;
-                
+
             case XmlNodeType::Text:
                 if (!node.value.empty()) {
                     print("Text: \"{}\"\n", node.value);

@@ -61,9 +61,8 @@ XmlNode XmlTextParser::parse(XmlBuffer& buffer) {
         }
     }
 
-    auto whiteSpaceNode = allWhitespace && !text.empty();
     XmlNode node { };
-    node.nodeType = whiteSpaceNode ? XmlNodeType::Whitespace : XmlNodeType::Text;
+    node.nodeType = allWhitespace && !text.empty() ? XmlNodeType::Whitespace : XmlNodeType::Text;
     node.value = text;
     
     return node;

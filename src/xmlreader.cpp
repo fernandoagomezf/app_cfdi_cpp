@@ -1,5 +1,6 @@
 #include "xmlreader.hpp"
 #include "xmltextparser.hpp"
+#include "xmlcommentparser.hpp"
 #include <sstream>
 #include <stdexcept>
 #include <cctype>
@@ -13,6 +14,7 @@ using std::stoi;
 using std::string;
 using std::string_view;
 using std::unique_ptr;
+using cfdi::XmlCommentParser;
 using cfdi::XmlNodeType;
 using cfdi::XmlNode;
 using cfdi::XmlReader;
@@ -207,36 +209,12 @@ void XmlReader::parseText() {
 }
 
 void XmlReader::parseComment() {
-    // Expect "<!--"
-    if (_buffer.read() != '-' || !_buffer.canRead() || _buffer.read() != '-') {
-        throw runtime_error("Invalid comment syntax");
-    }
+    XmlCommentParser parser { };
+    XmlNode node { parser.parse(_buffer) };
 
-    string comment { };
-    bool foundEnd { false };
-
-    while (_buffer.canRead()) {
-        auto c = _buffer.read();        
-        if (c == '-' && _buffer.canRead() && _buffer.peek() == '-') {
-            _buffer.read(); // consume second '-'
-            
-            if (_buffer.canRead() && _buffer.peek() == '>') {
-                _buffer.read(); // consume '>'
-                foundEnd = true;
-                break;
-            } else {
-                comment += "--";
-            }
-        } else {
-            comment += c;
-        }
-    }
-
-    if (!foundEnd) {
-        throw runtime_error("Unclosed comment");
-    }
-
-    setNodeInfo(XmlNodeType::Comment, "", comment);
+    _nodeType = node.nodeType;
+    _name = "";
+    _value = node.value;
 }
 
 void XmlReader::parseCDATA() {

@@ -1,8 +1,6 @@
-#ifndef _XMLTEXTPARSER_HPP_
-#define _XMLTEXTPARSER_HPP_
+#ifndef _XMLCOMMENT_HPP_
+#define _XMLCOMMENT_HPP_
 
-#include "xmlbuffer.hpp"
-#include "xmlnode.hpp"
 #include "xmlfragmentparser.hpp"
 
 namespace cfdi {
@@ -10,10 +8,10 @@ namespace cfdi {
     using cfdi::XmlFragmentParser;
     using cfdi::XmlNode;
 
-    class XmlTextParser : public XmlFragmentParser {
+    class XmlCommentParser : public XmlFragmentParser {
         public:
             virtual XmlNode parse(XmlBuffer& buffer) final;
     };
 }
 
-#endif
+#endif 

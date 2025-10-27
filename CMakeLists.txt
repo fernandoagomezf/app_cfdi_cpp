@@ -19,6 +19,7 @@ add_library(CFDILib STATIC
     src/xmlbuffer.cpp
     src/xmlfragmentparser.cpp
     src/xmltextparser.cpp
+    src/xmlcommentparser.cpp 
 )
 target_include_directories(CFDILib PUBLIC include)
 target_link_libraries(CFDILib PRIVATE fmt::fmt)
