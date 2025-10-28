@@ -8,7 +8,7 @@ namespace cfdi {
 
     struct CFDITransfer {               // cfdi:Traslado
         string base;                    // cfdi:Traslado - Base
-        string taxCode;                 // cfdi:Traslado - Impuesto
+        string code;                    // cfdi:Traslado - Impuesto
         string factorType;              // cfdi:Traslado - TipoFactor
         string rate;                    // cfdi:Traslado - TasaOCuota
         string amount;                  // cfdi:Traslado - Importe
