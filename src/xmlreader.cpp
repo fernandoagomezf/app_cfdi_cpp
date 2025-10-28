@@ -32,22 +32,18 @@ using cfdi::XmlTextParser;
 
 XmlReader::XmlReader(string_view xml)
     : _buffer { xml, 0 },
-      _eof { false },
-      _nodeType { XmlNodeType::None },
+      _currentNode { .nodeType = XmlNodeType::None },
       _depth { 0 },
-      _isEmptyElement { false },
-      _readContent { false }
+      _eof { false }
 {
     _eof = xml.empty();
 }
 
 XmlReader::XmlReader(istream& stream)
     : _buffer { { }, 0  },
-      _eof { false },
-      _nodeType { XmlNodeType::None },
+      _currentNode { },
       _depth { 0 },
-      _isEmptyElement { false },
-      _readContent { false }
+      _eof { false }
 {
     ostringstream ss;
     ss << stream.rdbuf();
@@ -61,39 +57,26 @@ bool XmlReader::read() {
         return false;
     }
 
-    _attributes.clear();
-    _isEmptyElement = false;
-    _name.clear();
-    _localName.clear();
-    _prefix.clear();
-    _value.clear();
-
+    _currentNode =  { 
+        .nodeType = XmlNodeType::None
+    };
     auto result { readInternal() };
 
     return result;
 }
 
 XmlNode XmlReader::current() const {
-    return {
-        _nodeType, 
-        _name, 
-        _localName, 
-        _prefix, 
-        _value, 
-        _depth,
-        _isEmptyElement,
-        _eof, 
-        _attributes
-    };
+    return _currentNode;
 }
-
 
 bool XmlReader::readInternal() {
     _buffer.skipWhiteSpace();
 
     if (!_buffer.canRead()) {
         _eof = true;
-        _nodeType = XmlNodeType::None;
+        _currentNode = { 
+            .nodeType = XmlNodeType::None
+        };
         return false;
     }
 
@@ -151,72 +134,42 @@ bool XmlReader::readInternal() {
 
 void XmlReader::parseElement() {
     XmlElementParser parser { _buffer };
-    XmlNode node { parser.parse() };
-    
-    _nodeType = node.nodeType;
-    _name = node.name;
-    _prefix = node.prefix;
-    _localName = node.localName;
-    _attributes = node.attributes;
-    if (node.nodeType == XmlNodeType::Element && !node.isEmpty)
-        ++_depth;
-    else 
-        --_depth;
+    _currentNode = { parser.parse() };    
+    if (_currentNode.nodeType == XmlNodeType::Element && !_currentNode.isEmpty) {
+        _currentNode.depth = ++_depth;
+    } else if (_currentNode.nodeType == XmlNodeType::EndElement) {
+        _currentNode.depth = --_depth;
+    }
 }
 
 void XmlReader::parseText() {
     XmlTextParser parser { _buffer };
-    XmlNode node { parser.parse() };
-    
-    _nodeType = node.nodeType;
-    _name = node.name;
-    _value = node.value;
+    _currentNode = { parser.parse() };    
 }
 
 void XmlReader::parseComment() {
     XmlCommentParser parser { _buffer };
-    XmlNode node { parser.parse() };
-
-    _nodeType = node.nodeType;
-    _name = node.name;
-    _value = node.value;
+    _currentNode = { parser.parse() };
 }
 
 void XmlReader::parseCDATA() {
     XmlCDataParser parser { _buffer };
-    XmlNode node { parser.parse() };
-
-    _nodeType = node.nodeType;
-    _name = node.name;
-    _value = node.value;
+    _currentNode = { parser.parse() };
 }
 
 void XmlReader::parseProcessingInstruction() {
     XmlProcessingInstructionParser parser { _buffer };
-    XmlNode node { parser.parse() };
-    
-    _nodeType = node.nodeType;
-    _name = node.name;
-    _value = node.value;
+    _currentNode = { parser.parse() };
 }
 
 void XmlReader::parseXmlDeclaration() {
     XmlDeclarationParser parser { _buffer };
-    XmlNode node { parser.parse() };
-
-    _nodeType = node.nodeType;
-    _name = node.name;
-    _value = node.value;
-    _attributes = node.attributes;
+    _currentNode = { parser.parse() };
 }
 
 void XmlReader::parseDocumentType() {
     XmlDeclarationParser parser { _buffer };
-    XmlNode node { parser.parse() };
-
-    _nodeType = node.nodeType;
-    _name = node.name;
-    _value = node.value;
+    _currentNode = { parser.parse() };
 }
 
 

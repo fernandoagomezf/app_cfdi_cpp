@@ -11,6 +11,8 @@
         "xlocale": "cpp",
         "stdexcept": "cpp",
         "utility": "cpp",
-        "istream": "cpp"
+        "istream": "cpp",
+        "filesystem": "cpp",
+        "iosfwd": "cpp"
     }
 }

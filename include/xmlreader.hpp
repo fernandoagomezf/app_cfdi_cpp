@@ -39,19 +39,10 @@ namespace cfdi {
             void parseXmlDeclaration();
             void parseDocumentType();
             
-            XmlBuffer _buffer;
             bool _eof;
-            
-            XmlNodeType _nodeType;
-            string _name;
-            string _localName;
-            string _prefix;
-            string _value;
             int _depth;
-            bool _isEmptyElement;
-            map<string, string> _attributes;
-            
-            bool _readContent;
+            XmlBuffer _buffer;            
+            XmlNode _currentNode;
     };
 
 } 
