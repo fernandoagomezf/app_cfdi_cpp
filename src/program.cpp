@@ -1,70 +1,59 @@
 #include <iostream>
 #include <fstream>
 #include <filesystem>
-#include <print>
-#include "xmlreader.hpp"
+#include <locale>
+#include <format>
+#include <stdexcept>
+#include "document.hpp"
 
-using std::ostringstream;
-using std::string;
+using std::cout;
 using std::ifstream;
-using std::print;
-using cfdi::XmlNode;
-using cfdi::XmlNodeType;
-using cfdi::XmlReader;
+using std::filesystem::current_path;
+using std::locale;
+using std::ostringstream;
+using std::format;
+using std::runtime_error;
+using std::string;
+using std::println;
+using cfdi::Document;
+using cfdi::Summary;
 
 int main() {
-    print("\n=== XmlReader Demo ===\n");
+    locale esmx { "es_MX.UTF-8" };
+    locale::global(esmx);
+    cout.imbue(esmx);
 
-    string fileName { "data/d0e7ed17-e3ec-41ca-9cf8-61b01da88fc5.xml" };
-    ifstream file(fileName);
-    if (!file.is_open()) {
-        print("\n *** CFDI file {0} not found.", fileName);
-        print("\n {0}", std::filesystem::current_path().string());
-        return -1;
-    }
+    println(cout, "=== Blendwerk Procesador de CFDI ===\n");
     
-    XmlReader reader { file };
-    
-    while (reader.read()) {        
-        XmlNode node { reader.current() };
-        for (int i = 0; i < node.depth; i++) {
-            print("  ");
+    try {
+        string fileName { "data/d0e7ed17-e3ec-41ca-9cf8-61b01da88fc5.xml" };
+        ifstream file { fileName };
+        if (!file.is_open()) {
+            println(cout, "\t *** Archivo CFDI '{0}' no encontrado. ***", fileName);
+            println(cout, "\t {0}", current_path().string());
+            return -1;
         }
-        
-        switch (node.nodeType) {
-            case XmlNodeType::Element:
-                print("Element: {0} (prefix: '{1}', localName: '{2}')", node.name, node.prefix, node.localName);
-                if (node.isEmpty) {
-                    print(" [Empty]");
-                }
-                print("\n");
-                
-                if (node.hasAttributes()) {
-                    for (const auto& [name, value] : node.attributes) {
-                        for (int i = 0; i < node.depth + 1; i++) {
-                            print("  ");
-                        }
-                        print("@{0} = \"{1}\"\n", name, value);
-                    }
-                }
-                break;
-                
-            case XmlNodeType::EndElement:
-                print("EndElement: {0}\n", node.name);
-                break;
 
-            case XmlNodeType::Text:
-                if (!node.value.empty()) {
-                    print("Text: \"{0}\"\n", node.value);
-                }
-                break;
-                
-            default:
-                break;
-        }
+        ostringstream ss { };
+        ss << file.rdbuf();
+        auto xml { ss.str() };
+
+        Document doc { Document::fromXml(xml) };
+        Summary summary { doc.summarize() };
+        println(cout, "\t Fecha: \t\t{0}",          summary.date);
+        println(cout, "\t Descripción: \t\t{0}",    summary.description);
+        println(cout, "\t RFC: \t\t\t{0}",          summary.issuerTaxCode);
+        println(cout, "\t No. Factura: \t\t{0}",    summary.invoiceId);
+        println(cout, "\t Sub Total: \t\t{0}",      summary.subTotal);
+        println(cout, "\t IVA: \t\t\t{0}",          summary.taxes);
+        println(cout, "\t Total: \t\t{0}",          summary.total);
+        println(cout);
+
+    } catch (const runtime_error& ex) {
+        println(cout, "*** Error al leer archivo CFDI: {0} ***", ex.what());
     }
-    
-    print("\n=== End of XmlReader Demo ===\n");
+
+    println(cout, "\n=== FIN ===");
 
     return 0;
 }

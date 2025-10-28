@@ -9,6 +9,7 @@
 #include "cfdiconcept.hpp"
 #include "cfditax.hpp"
 #include "cfdicomplement.hpp"
+#include "summary.hpp"
 
 namespace cfdi {
     using std::list;
@@ -19,6 +20,7 @@ namespace cfdi {
     using cfdi::CFDIIssuer;
     using cfdi::CFDIReceiver;
     using cfdi::CFDITax;
+    using cfdi::Summary;
 
     class Document {
         public:
@@ -26,8 +28,10 @@ namespace cfdi {
             const CFDIIssuer& issuer() const;
             const CFDIReceiver& receiver() const;
             const list<CFDIConcept>& concepts() const;
-            const list<CFDITax>& taxes() const;
+            const CFDITax& taxes() const;
             const CFDIComplement& complement() const;
+
+            Summary summarize() const;
 
             static Document fromXml(string_view xml);
         
@@ -36,7 +40,7 @@ namespace cfdi {
             CFDIIssuer _issuer;             // cfdi:Emisor
             CFDIReceiver _receiver;         // cfdi:Receptor
             list<CFDIConcept> _concepts;    // cfdi:Conceptos
-            list<CFDITax> _taxes;           // cfdi:Impuestos
+            CFDITax _taxes;                 // cfdi:Impuestos
             CFDIComplement _complement;     // cfdi:Complemento
     };
 }
