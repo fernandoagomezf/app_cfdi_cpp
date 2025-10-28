@@ -4,6 +4,7 @@
 #include "xmlcdataparser.hpp"
 #include "xmlprocessinginstructionparser.hpp"
 #include "xmldeclarationparser.hpp"
+#include "xmldoctypeparser.hpp"
 #include <sstream>
 #include <stdexcept>
 #include <cctype>
@@ -20,6 +21,7 @@ using std::unique_ptr;
 using cfdi::XmlCDataParser;
 using cfdi::XmlCommentParser;
 using cfdi::XmlDeclarationParser;
+using cfdi::XmlDocTypeParser;
 using cfdi::XmlNodeType;
 using cfdi::XmlNode;
 using cfdi::XmlProcessingInstructionParser;
@@ -256,39 +258,12 @@ void XmlReader::parseXmlDeclaration() {
 }
 
 void XmlReader::parseDocumentType() {
-    // Expect "<!DOCTYPE"
-    string doctype = "DOCTYPE";
-    for (char c : doctype) {
-        if (!_buffer.canRead() || _buffer.read() != c) {
-            throw runtime_error("Invalid DOCTYPE syntax");
-        }
-    }
+    XmlDeclarationParser parser { };
+    XmlNode node { parser.parse(_buffer) };
 
-    string dtd { };
-    int bracketDepth { 0 };
-    bool foundEnd = { false };
-
-    while (_buffer.canRead()) {
-        auto c = _buffer.read();        
-        if (c == '[') {
-            bracketDepth++;
-            dtd += c;
-        } else if (c == ']') {
-            bracketDepth--;
-            dtd += c;
-        } else if (c == '>' && bracketDepth == 0) {
-            foundEnd = true;
-            break;
-        } else {
-            dtd += c;
-        }
-    }
-
-    if (!foundEnd) {
-        throw runtime_error("Unclosed DOCTYPE");
-    }
-
-    setNodeInfo(XmlNodeType::DocumentType, "DOCTYPE", dtd);
+    _nodeType = node.nodeType;
+    _name = node.name;
+    _value = node.value;
 }
 
 void XmlReader::parseAttributes() {
