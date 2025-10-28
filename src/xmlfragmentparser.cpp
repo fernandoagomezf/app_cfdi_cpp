@@ -1,15 +1,24 @@
 #include "xmlfragmentparser.hpp"
+#include <cmath>
 #include <map>
 #include <string>
 #include <stdexcept>
 
-using std::map;
-using std::runtime_error;
-using std::string;
 using std::isalpha;
 using std::isalnum;
+using std::make_pair;
+using std::map;
+using std::max;
+using std::pair;
+using std::runtime_error;
+using std::string;
+using std::string_view;
 using cfdi::XmlBuffer;
 using cfdi::XmlFragmentParser;
+
+XmlFragmentParser::XmlFragmentParser()
+{    
+}
 
 string XmlFragmentParser::parseName(XmlBuffer& buffer) {
     string name { };
@@ -132,4 +141,20 @@ string XmlFragmentParser::readAttributeValue(XmlBuffer& buffer) {
     }
 
     return value;
+}
+
+pair<string, string> XmlFragmentParser::splitQualifiedName(string_view name) const {
+    size_t colonPos = name.find(':');
+    
+    string prefix { };
+    string localName { };
+
+    if (colonPos != string::npos) {
+        prefix = name.substr(0, colonPos);
+        localName = name.substr(colonPos + 1);
+    } else {
+        localName = name;
+    }
+
+    return make_pair(prefix, localName);
 }

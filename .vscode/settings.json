@@ -9,6 +9,7 @@
         "sstream": "cpp",
         "xlocbuf": "cpp",
         "xlocale": "cpp",
-        "stdexcept": "cpp"
+        "stdexcept": "cpp",
+        "utility": "cpp"
     }
 }

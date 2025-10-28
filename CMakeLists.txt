@@ -23,6 +23,7 @@ add_library(CFDILib STATIC
     src/xmlprocessinginstructionparser.cpp
     src/xmldeclarationparser.cpp
     src/xmldoctypeparser.cpp
+    src/xmlelementparser.cpp
 )
 target_include_directories(CFDILib PUBLIC include)
 target_link_libraries(CFDILib PRIVATE Boost::uuid)

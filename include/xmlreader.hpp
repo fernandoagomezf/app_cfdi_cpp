@@ -34,7 +34,6 @@ namespace cfdi {
 
             bool readInternal();            
             void parseElement();
-            void parseEndElement();
             void parseText();
             void parseComment();
             void parseCDATA();

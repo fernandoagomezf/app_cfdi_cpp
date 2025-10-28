@@ -5,6 +5,7 @@
 #include "xmlprocessinginstructionparser.hpp"
 #include "xmldeclarationparser.hpp"
 #include "xmldoctypeparser.hpp"
+#include "xmlelementparser.hpp"
 #include <sstream>
 #include <stdexcept>
 #include <cctype>
@@ -22,6 +23,7 @@ using cfdi::XmlCDataParser;
 using cfdi::XmlCommentParser;
 using cfdi::XmlDeclarationParser;
 using cfdi::XmlDocTypeParser;
+using cfdi::XmlElementParser;
 using cfdi::XmlNodeType;
 using cfdi::XmlNode;
 using cfdi::XmlProcessingInstructionParser;
@@ -135,9 +137,6 @@ bool XmlReader::readInternal() {
             } else {
                 parseProcessingInstruction();
             }
-        } else if (next == '/') {
-            _buffer.read(); // consume '/'
-            parseEndElement();
         } else {
             parseElement();
         }
@@ -151,64 +150,18 @@ bool XmlReader::readInternal() {
 }
 
 void XmlReader::parseElement() {
-    string name { readName() };
+    XmlElementParser parser { };
+    XmlNode node { parser.parse(_buffer) };
     
-    if (name.empty()) {
-        throw std::runtime_error("Invalid element name");
-    }
-
-    // Parse attributes
-    parseAttributes();
-    _buffer.skipWhiteSpace();
-
-    // Check for empty element
-    if (_buffer.canRead() && _buffer.peek() == '/') {
-        _buffer.read(); // consume '/'
-        _isEmptyElement = true;
-    }
-
-    // Expect closing '>'
-    if (!_buffer.canRead() || _buffer.read() != '>') {
-        throw std::runtime_error("Expected '>' to close element tag");
-    }
-
-    if (!_isEmptyElement) {
-        _depth++;
-    }
-
-    string prefix { };
-    string localName { };
-    splitQualifiedName(name, prefix, localName);    
-    setNodeInfo(XmlNodeType::Element, name, "");
-    _prefix = prefix;
-    _localName = localName;
-}
-
-void XmlReader::parseEndElement() {
-    string name = readName();
-    
-    if (name.empty()) {
-        throw runtime_error("Invalid end element name");
-    }
-
-    _buffer.skipWhiteSpace();
-
-    // Expect closing '>'
-    if (!_buffer.canRead() || _buffer.read() != '>') {
-        throw runtime_error("Expected '>' to close end element tag");
-    }
-
-    _depth--;
-    if (_depth < 0) {
-        _depth = 0;
-    }
-
-    string prefix { };
-    string localName { };
-    splitQualifiedName(name, prefix, localName);    
-    setNodeInfo(XmlNodeType::EndElement, name, "");
-    _prefix = prefix;
-    _localName = localName;
+    _nodeType = node.nodeType;
+    _name = node.name;
+    _prefix = node.prefix;
+    _localName = node.localName;
+    _attributes = node.attributes;
+    if (node.nodeType == XmlNodeType::Element && !node.isEmpty)
+        ++_depth;
+    else 
+        --_depth;
 }
 
 void XmlReader::parseText() {
