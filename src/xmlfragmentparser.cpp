@@ -1,6 +1,10 @@
 #include "xmlfragmentparser.hpp"
+#include <map>
 #include <string>
+#include <stdexcept>
 
+using std::map;
+using std::runtime_error;
 using std::string;
 using std::isalpha;
 using std::isalnum;
@@ -33,4 +37,99 @@ string XmlFragmentParser::parseName(XmlBuffer& buffer) {
     }
 
     return name;
+}
+
+map<string, string> XmlFragmentParser::parseAttributes(XmlBuffer& buffer) {
+    map<string, string>attributes { };
+
+    while (buffer.canRead()) {
+        buffer.skipWhiteSpace();
+
+        auto c = buffer.peek();
+        
+        // Check for end of tag
+        if (c == '>' || c == '/' || c == '?') {
+            break;
+        }
+
+        // Read attribute name
+        string attrName { parseName(buffer) };        
+        if (attrName.empty()) {
+            break;
+        }
+
+        buffer.skipWhiteSpace();
+
+        // Expect '='
+        if (!buffer.canRead() || buffer.read() != '=') {
+            throw runtime_error("Expected '=' after attribute name");
+        }
+
+        buffer.skipWhiteSpace();
+
+        // Read attribute value
+        string attrValue { readAttributeValue(buffer) };
+
+        attributes[attrName] = attrValue;
+    }
+
+    return attributes;
+}
+
+string XmlFragmentParser::readAttributeValue(XmlBuffer& buffer) {
+    if (!buffer.canRead()) {
+        throw runtime_error("Expected attribute value");
+    }
+
+    auto quote = buffer.read();    
+    if (quote != '"' && quote != '\'') {
+        throw runtime_error("Attribute value must be quoted");
+    }
+
+    string value { };
+    while (buffer.canRead()) {
+        auto c = buffer.read();        
+        if (c == quote) {
+            break;
+        } else if (c == '&') {
+            // Handle entity references
+            string entity { };
+            while (buffer.canRead() && buffer.peek() != ';') {
+                entity += buffer.read();
+            }
+            if (buffer.canRead()) {
+                buffer.read(); // consume ';'
+            }
+            
+            // Decode common entities
+            if (entity == "lt") {
+                value += '<';
+            } else if (entity == "gt") {
+                value += '>';
+            } else if (entity == "amp") {
+                value += '&';
+            } else if (entity == "quot") {
+                value += '"';
+            } else if (entity == "apos") {
+                value += '\'';
+            } else if (!entity.empty() && entity[0] == '#') {
+                // Numeric character reference
+                int code { 0 };
+                if (entity.length() > 1 && entity[1] == 'x') {
+                    // Hexadecimal
+                    code = stoi(entity.substr(2), nullptr, 16);
+                } else {
+                    // Decimal
+                    code = stoi(entity.substr(1));
+                }
+                value += static_cast<char>(code);
+            } else {
+                value += '&' + entity + ';';
+            }
+        } else {
+            value += c;
+        }
+    }
+
+    return value;
 }

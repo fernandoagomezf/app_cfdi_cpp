@@ -1,11 +1,11 @@
 #include "xmltextparser.hpp"
 
 using std::string;
-using cfdi::XmlTextParser;
 using cfdi::XmlBuffer;
 using cfdi::XmlFragmentParser;
 using cfdi::XmlNode;
 using cfdi::XmlNodeType;
+using cfdi::XmlTextParser;
 
 XmlNode XmlTextParser::parse(XmlBuffer& buffer) {
     string text { };    

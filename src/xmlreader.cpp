@@ -3,6 +3,7 @@
 #include "xmlcommentparser.hpp"
 #include "xmlcdataparser.hpp"
 #include "xmlprocessinginstructionparser.hpp"
+#include "xmldeclarationparser.hpp"
 #include <sstream>
 #include <stdexcept>
 #include <cctype>
@@ -18,6 +19,7 @@ using std::string_view;
 using std::unique_ptr;
 using cfdi::XmlCDataParser;
 using cfdi::XmlCommentParser;
+using cfdi::XmlDeclarationParser;
 using cfdi::XmlNodeType;
 using cfdi::XmlNode;
 using cfdi::XmlProcessingInstructionParser;
@@ -121,9 +123,13 @@ bool XmlReader::readInternal() {
             _buffer.read(); // consume '?'
             
             // Check if it's XML declaration
-            if (_buffer.position() + 3 <= _buffer.length() && 
-                _buffer.substr(3) == "xml") {
-                parseXmlDeclaration();
+            if (_buffer.position() + 3 <= _buffer.length()) {
+                string ss { _buffer.substr(3) };
+                if (ss == "xml")  {
+                    parseXmlDeclaration();
+                } else {
+                    parseProcessingInstruction();    
+                }
             } else {
                 parseProcessingInstruction();
             }
@@ -240,19 +246,13 @@ void XmlReader::parseProcessingInstruction() {
 }
 
 void XmlReader::parseXmlDeclaration() {
-    // We're already past "<?xml"    
-    _buffer.consume(3);
+    XmlDeclarationParser parser { };
+    XmlNode node { parser.parse(_buffer) };
 
-    // Parse attributes (version, encoding, standalone)
-    parseAttributes();
-    _buffer.skipWhiteSpace();
-
-    // Expect "?>"
-    if (!_buffer.canRead() || _buffer.read() != '?' || !_buffer.canRead() || _buffer.read() != '>') {
-        throw runtime_error("Invalid XML declaration syntax");
-    }
-
-    setNodeInfo(XmlNodeType::XmlDeclaration, "xml", "");
+    _nodeType = node.nodeType;
+    _name = node.name;
+    _value = node.value;
+    _attributes = node.attributes;
 }
 
 void XmlReader::parseDocumentType() {

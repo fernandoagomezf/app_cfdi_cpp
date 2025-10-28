@@ -33,17 +33,18 @@ size_t XmlBuffer::length() const {
     return _buffer.length();
 }
 
-string_view XmlBuffer::substr(size_t pos, size_t len) const {
+string XmlBuffer::substr(size_t pos, size_t len) const {
     if (pos < 0) {
         throw invalid_argument("The length cannot be negative.");
     }
     if (len <= 0) {
         throw invalid_argument("The length cannot be negative or zero.");
     }
-    return substr(pos, len);
+    string result { _buffer.substr(pos, len) };
+    return result;
 }
 
-string_view XmlBuffer::substr(size_t len) const {
+string XmlBuffer::substr(size_t len) const {
     return substr(_position, len);
 }
 

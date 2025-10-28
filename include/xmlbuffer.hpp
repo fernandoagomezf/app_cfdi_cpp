@@ -22,13 +22,12 @@ namespace cfdi {
 
             size_t position() const;
             size_t length() const;
-            string_view substr(size_t pos, size_t len) const;
-            string_view substr(size_t len) const;
+            string substr(size_t pos, size_t len) const;
+            string substr(size_t len) const;
             
             static bool isWhiteSpace(char c);
 
         private:
-
             string _buffer;
             size_t _position;
     };
