@@ -30,10 +30,11 @@ XmlNode XmlDeclarationParser::parse() {
         throw runtime_error("Invalid XML declaration syntax");
     }
 
-    XmlNode node { };
-    node.nodeType = XmlNodeType::XmlDeclaration;
-    node.name = "xml";
-    node.attributes = attributes;
+    XmlNode node { 
+        .nodeType = XmlNodeType::XmlDeclaration,
+        .name = "xml",
+        .attributes = attributes,
+    };
 
     return node;
 }

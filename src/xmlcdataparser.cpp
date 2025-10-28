@@ -51,9 +51,10 @@ XmlNode XmlCDataParser::parse() {
         throw runtime_error("Unclosed CDATA section");
     }
 
-    XmlNode node { };
-    node.nodeType = XmlNodeType::CDATA;
-    node.value = cdata;
+    XmlNode node { 
+        .nodeType = XmlNodeType::CDATA,
+        .value = cdata,
+    };
 
     return node;
 }

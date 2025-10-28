@@ -52,13 +52,14 @@ XmlNode XmlElementParser::parseElementStart(){
 
     auto [prefix, localName] = splitQualifiedName(name);
     
-    XmlNode node { };
-    node.nodeType = XmlNodeType::Element;
-    node.name = name;
-    node.prefix = prefix;
-    node.localName = localName;
-    node.attributes = attributes;
-    node.isEmpty = isEmpty;
+    XmlNode node { 
+        .nodeType = XmlNodeType::Element,
+        .name = name,
+        .localName = localName,
+        .prefix = prefix,
+        .isEmpty = isEmpty,
+        .attributes = attributes,
+    };
     
     return node;
 }
@@ -80,11 +81,12 @@ XmlNode XmlElementParser::parseElementEnd(){
 
     auto [prefix, localName] = splitQualifiedName(name);
 
-    XmlNode node { };
-    node.nodeType = XmlNodeType::EndElement;
-    node.name = name;
-    node.prefix = prefix;
-    node.localName = localName;
+    XmlNode node { 
+        .nodeType = XmlNodeType::EndElement,
+        .name = name,
+        .localName = localName,
+        .prefix = prefix
+    };
 
     return node;
 }

@@ -68,9 +68,10 @@ XmlNode XmlTextParser::parse() {
         }
     }
 
-    XmlNode node { };
-    node.nodeType = allWhitespace && !text.empty() ? XmlNodeType::Whitespace : XmlNodeType::Text;
-    node.value = text;
+    XmlNode node { 
+        .nodeType = allWhitespace && !text.empty() ? XmlNodeType::Whitespace : XmlNodeType::Text,
+        .value = text,
+    };
     
     return node;
 }

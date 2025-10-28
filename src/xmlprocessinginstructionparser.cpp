@@ -43,10 +43,11 @@ XmlNode XmlProcessingInstructionParser::parse() {
         throw runtime_error("Unclosed processing instruction");
     }
 
-    XmlNode node { };
-    node.nodeType = XmlNodeType::ProcessingInstruction;
-    node.name = target;
-    node.value = data;
+    XmlNode node { 
+        .nodeType = XmlNodeType::ProcessingInstruction,
+        .name = target,
+        .value = data,
+    };
 
     return node;
 }

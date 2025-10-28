@@ -50,10 +50,11 @@ XmlNode XmlDocTypeParser::parse() {
         throw runtime_error("Unclosed DOCTYPE");
     }
 
-    XmlNode node { };
-    node.nodeType = XmlNodeType::DocumentType;
-    node.name = "DOCTYPE";
-    node.value = dtd;
+    XmlNode node { 
+        .nodeType = XmlNodeType::DocumentType,
+        .name = "DOCTYPE",
+        .value = dtd,
+    };
     
     return node;
 }

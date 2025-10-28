@@ -47,9 +47,10 @@ XmlNode XmlCommentParser::parse() {
         throw runtime_error("Unclosed comment");
     }
 
-    XmlNode node { };
-    node.nodeType = XmlNodeType::Comment;
-    node.value = comment;
+    XmlNode node { 
+        .nodeType = XmlNodeType::Comment,
+        .value = comment,
+    };
 
     return node;
 }
