@@ -1,0 +1,49 @@
+#include "utilities.hpp"
+
+using std::ostream;
+using std::endl;
+
+void cfdi::about(ostream& out) {
+    out << R"(
+        MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMWWNNXK00OOkkkkkkkkO00KXNNWMMMMMMMMMMMMMMMM
+        MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMWWNXK0OOOkkxxxxxxxdddooooooodxkO0KNWMMMMMMMMMMM
+        MMMMMMMMMMMMMMMMMMMMMMMMMMMMMWNXK0Okxxxxxxxxdollc::;;;,,,,,,,,,;;;:coxOKXWMMMMMM
+        MMMMMMMMMMMMMMMMMMMMMMMMMMWNX0Okxxxxxxdoolc:;,,,,,,,,,,,,,,,,,,;:lodkO0KXWMMMMMM
+        MMMMMMMMMMMMMMMMMMMMMMMMWX0Okxxxddolc:;;,,,,,,,,,,,,,,,,;:codk0KXWWMMMMMMMMMMMMM
+        MMMMMMMMMMMMMMMMMMMMMMNKOkxxdoolc:;;,,,,,,,,,,,,,,,:coxk0XNWMMMMMMMMMMMMMMMMMMMM
+        MMMMMMMMMMMMMMMMMMMMNKOxdoollcc:;,,,,,,;;;,,,;:ldk0KNWMMMMMMMMMMMMMMMMMMMMMMMMMM
+        MMMMMMMMMMMMMMMMMMWKOxoolllcc:,,,,,,,,,:cdkxx0XWWWNX0kxddxOKNMMMMMMMMMMMMMMMMMMM
+        MMMMMMMMMMMMMMMMMNOdolllllccclooooolc:;,,l0WWNKOxoc:;,:lxOKNWMMMMMMMMMMMMMMMMMMM
+        MMMMMMMMMMMMMMMWKxollllldk0KXNWWWWWNNK0kxolooc;,,,,;cxKNMMMMMMMMMMMMMMMMMMMMMMMM
+        MMMMMMMMMMMMMMNOollllokKNMMMMMMMMMMMMMMMMWKxc;,,;lk0NWMMMMMMMMMMMMMMMMMMMMMMMMMM
+        MMMMMMMMMMMMMNklllllxKWMMMMMMMMMMMMMMMMMMMMMNOd:;:d0NMMMMMMMMMMMMMMMMMMMMMMMMMMM
+        MMMMMMMMMMMWXxlllllkNMMMMMMMMMMMMMMMMMMMMMMMMMWXkl;;lONWMMMMMMMMMMMMMMMMMMMMMMMM
+        MMMMMMMMMMWKdllllllxNMMMMMMMMMMMMMMMMMMMMMMMMMMMMN0dc;cxXWMMMMMMMMMMMMMMMMMMMMMM
+        MMMMMMMMMWKxllllllccdXMMMMMMNX0kkxxkO0XNWWMMMMMMMMMWXOo:cdKWMMMMMMMMMMMMMMMMMMMM
+        MMMMMMMMWKxollllllc;;dXMMMNOl::lodxxxxxxkkOXWMMMMMMMMMWKxl:oONMMMMMMMMMMMMMMMMMM
+        MMMMMMMWXkdllllllc:,,;dNMWk:,,:cldkOXNWNNXKXWMMMMMMMMMMMWNOdclkXWMMMMMMMMMMMMMMM
+        MMMMMMMNOxollllllc;,,,;dNKl,,,,,,,,,:lxkOOOOOOOOOOOOOOOOOOkko:;cxKWMMMMMMMMMMMMM
+        MMMMMMW0kxolllllc:,,,,,;dx:,,,,,,,,,,,,,,,,,,,;:cllllooooooooddddkXWMMMMMMMMMMMM
+        MMMMMMXOxdllllllc;,,,,,,;:,,,,,,,,,,,,,,,,,,;coxO0XNWWWWWWWWWWWMMMMMMMMMMMMMMMMM
+        MMMMMWKkxdllllllc;,,,,,,,,,,,,,,,,,,,,,,,,,,,;;;;;cdKWMMMMMMMMMMMMMMMMMMMMMMMMMM
+        MMMMMN0xxdllllllc;,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,cOWMMMMMMMMMMMMMMMMMMMMMMMMM
+        MMMMMNOxxdllllllc;,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,lKMMMMMMMMMMMMMMMMMMMMMMMMM
+        MMMMMXOxxxolllllc;,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,;dNMMMMMMMMMMMMMMMMMMMMMMMM
+        MMMMMXOxxxolllllc;,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,cKMMMMMMMMMMMMMMMMMMMMMMMM
+        MMMMMNOxxxdlllllc:,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,:OMMMMMMMMMMMMMMMMMMMMMMMM
+        MMMMMN0xxxxolllll:;,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,c0MMMMMMMMMMMMMMMMMMMMMMMM
+        MMMMMWKkxxxdollllc;,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,oXMMMMMMMMMMMMMMMMMMMMMMMM
+        MMMMMMXOxxxxdlllllc;,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,c0WMMMMMMMMMMMMMMMMMMMMMMMM
+        MMMMMMW0kxxxxdllllc:,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,l0WMMMMMMMMMMMMMMMMMMMMMMMMM
+        MMMMMMMNOxxxxxdllllc:,,,,,,,,,,,,,,,,,,,,,,,,,,,,,:xXWMMMMMMMMMMMMMMMMMMMMMMMMMM
+        MMMMMMMWXkxkxxxdllllc:,,,,,,,,,,,,,,,,,,,,,,,,,;cxKWMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+        MMMMMMMMWKkxxxxxdolllc:,,,,,,,,,,,,,,,,,,,,,:lx0NMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+        MMMMMMMMMWKkkxxxxxolllc:;,,,,,;,,,,,,,:cloxOKNMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+        MMMMMMMMMMWKkxxxxxxdollcc;,,,;okxxdxk0KNWWMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+        MMMMMMMMMMMWXOkxxxxxxdollc:;,,;oOXNWMMMMMMWWNWMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+        MMMMMMMMMMMMMN0kxxxxxxxdollc:;,,,:lodxxxdddodKWMMMMMMMMWWMMMMMMMMMMMMMMMMMMMMMMM
+        MMMMMMMMMMMMMMWX0kxxxxxkxxdolc:;,,,,,,,,,,;l0WMMMMMWN0kkXMMMMMMMMMMMMMMMMMMMMMMM
+        MMMMMMMMMMMMMMMMWX0kxxxxxxxxxdolc;,,,,,:clkXNNNX0Oxoc;cOWMMMMMMMMMMMMMMMMMMMMMMM
+        MMMMMMMMMMMMMMMMMMNKkxkxxxxxxxxxdlc;,,;cldxxdolc;,,,,:kWMMMMMMMMMMMMMMMMMMMMMMMM        
+    )" << endl;
+}
