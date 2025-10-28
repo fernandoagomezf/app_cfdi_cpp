@@ -8,17 +8,13 @@
 #include "xmlelementparser.hpp"
 #include <sstream>
 #include <stdexcept>
-#include <cctype>
+#include <memory>
 
-using std::isalnum;
-using std::isalpha;
-using std::map;
+using std::unique_ptr;
+using std::make_unique;
 using std::ostringstream;
 using std::runtime_error;
-using std::stoi;
-using std::string;
 using std::string_view;
-using std::unique_ptr;
 using cfdi::XmlCDataParser;
 using cfdi::XmlCommentParser;
 using cfdi::XmlDeclarationParser;
@@ -28,7 +24,7 @@ using cfdi::XmlNodeType;
 using cfdi::XmlNode;
 using cfdi::XmlProcessingInstructionParser;
 using cfdi::XmlReader;
-using cfdi::XmlTextParser;
+using cfdi::XmlTextParser; 
 
 XmlReader::XmlReader(string_view xml)
     : _buffer { xml, 0 },
@@ -52,26 +48,21 @@ XmlReader::XmlReader(istream& stream)
     _eof = str.empty();
 }
 
+void XmlReader::resetNode() {
+        
+}
+
 bool XmlReader::read() {
-    if (_eof) {
-        return false;
-    }
+    unique_ptr<XmlFragmentParser> parser;
 
     _currentNode =  { 
         .nodeType = XmlNodeType::None
     };
-    auto result { readInternal() };
+    if (_eof) {
+        return false;
+    }
 
-    return result;
-}
-
-XmlNode XmlReader::current() const {
-    return _currentNode;
-}
-
-bool XmlReader::readInternal() {
     _buffer.skipWhiteSpace();
-
     if (!_buffer.canRead()) {
         _eof = true;
         _currentNode = { 
@@ -81,95 +72,62 @@ bool XmlReader::readInternal() {
     }
 
     auto c = _buffer.peek();
-
-    // Check for markup
     if (c == '<') {
-        _buffer.read(); // consume '<'        
+        _buffer.consume(); // consume '<'        
         if (!_buffer.canRead()) {
             throw runtime_error("Unexpected end of XML");
         }
 
         auto next = _buffer.peek();
         if (next == '!') {
-            _buffer.read(); // consume '!'            
+            _buffer.consume(); // consume '!'            
             if (!_buffer.canRead()) {
                 throw runtime_error("Unexpected end of XML");
             }
 
             auto third = _buffer.peek();            
             if (third == '-') {
-                parseComment();
+                parser = make_unique<XmlCommentParser>(_buffer);
             } else if (third == '[') {
-                parseCDATA();
+                parser = make_unique<XmlCDataParser>(_buffer);
             } else if (third == 'D') {
-                parseDocumentType();
+                parser = make_unique<XmlDocTypeParser>(_buffer);
             } else {
                 throw runtime_error("Invalid XML syntax");
             }
         } else if (next == '?') {
-            _buffer.read(); // consume '?'
+            _buffer.consume(); // consume '?'
             
-            // Check if it's XML declaration
-            if (_buffer.position() + 3 <= _buffer.length()) {
-                string ss { _buffer.substr(3) };
-                if (ss == "xml")  {
-                    parseXmlDeclaration();
-                } else {
-                    parseProcessingInstruction();    
-                }
+            if (_buffer.position() + 3 <= _buffer.length() && _buffer.substr(3) == "xml") {                
+                parser = make_unique<XmlDeclarationParser>(_buffer);                
             } else {
-                parseProcessingInstruction();
+                parser = make_unique<XmlProcessingInstructionParser>(_buffer);
             }
         } else {
-            parseElement();
+            parser = make_unique<XmlElementParser>(_buffer);
         }
-
-        return true;
     } else {
-        // Text content
-        parseText();
-        return true;
+        parser = make_unique<XmlTextParser>(_buffer);
     }
-}
 
-void XmlReader::parseElement() {
-    XmlElementParser parser { _buffer };
-    _currentNode = { parser.parse() };    
+    if (!parser) {
+        throw runtime_error("No parser available.");
+    }
+    _currentNode = { 
+        parser->parse()
+    };
     if (_currentNode.nodeType == XmlNodeType::Element && !_currentNode.isEmpty) {
         _currentNode.depth = ++_depth;
     } else if (_currentNode.nodeType == XmlNodeType::EndElement) {
         _currentNode.depth = --_depth;
     }
+
+    return true;
 }
 
-void XmlReader::parseText() {
-    XmlTextParser parser { _buffer };
-    _currentNode = { parser.parse() };    
+XmlNode XmlReader::current() const {
+    return _currentNode;
 }
 
-void XmlReader::parseComment() {
-    XmlCommentParser parser { _buffer };
-    _currentNode = { parser.parse() };
-}
-
-void XmlReader::parseCDATA() {
-    XmlCDataParser parser { _buffer };
-    _currentNode = { parser.parse() };
-}
-
-void XmlReader::parseProcessingInstruction() {
-    XmlProcessingInstructionParser parser { _buffer };
-    _currentNode = { parser.parse() };
-}
-
-void XmlReader::parseXmlDeclaration() {
-    XmlDeclarationParser parser { _buffer };
-    _currentNode = { parser.parse() };
-}
-
-void XmlReader::parseDocumentType() {
-    XmlDeclarationParser parser { _buffer };
-    _currentNode = { parser.parse() };
-}
 
 

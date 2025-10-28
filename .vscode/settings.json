@@ -13,6 +13,7 @@
         "utility": "cpp",
         "istream": "cpp",
         "filesystem": "cpp",
-        "iosfwd": "cpp"
+        "iosfwd": "cpp",
+        "memory": "cpp"
     }
 }
