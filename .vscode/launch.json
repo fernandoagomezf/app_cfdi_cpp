@@ -8,7 +8,7 @@
             "program": "${workspaceFolder}/build/msvc/debug/cfdi.exe",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${fileDirname}",
+            "cwd": "${workspaceFolder}",
             "environment": [],
             "console": "externalTerminal"
         },
