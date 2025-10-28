@@ -16,30 +16,35 @@ using std::string_view;
 using cfdi::XmlBuffer;
 using cfdi::XmlFragmentParser;
 
-XmlFragmentParser::XmlFragmentParser()
-{    
+XmlFragmentParser::XmlFragmentParser(XmlBuffer& buffer)
+    : _buffer { buffer }
+{
 }
 
-string XmlFragmentParser::parseName(XmlBuffer& buffer) {
+XmlBuffer& XmlFragmentParser::getBuffer() {
+    return _buffer;
+}
+
+string XmlFragmentParser::parseName() {
     string name { };
-    if (!buffer.canRead()) {
+    if (!_buffer.canRead()) {
         return name;
     }
 
-    auto c = buffer.peek();
+    auto c = _buffer.peek();
     
     // XML name must start with letter, underscore, or colon
     if (!isalpha(static_cast<unsigned char>(c)) && c != '_' && c != ':') {
         return name;
     }
 
-    while (buffer.canRead()) {
-        c = buffer.peek();
+    while (_buffer.canRead()) {
+        c = _buffer.peek();
         
         // Valid name characters
         if (isalnum(static_cast<unsigned char>(c)) || 
             c == '_' || c == ':' || c == '-' || c == '.') {
-            name += buffer.read();
+            name += _buffer.read();
         } else {
             break;
         }
@@ -48,13 +53,13 @@ string XmlFragmentParser::parseName(XmlBuffer& buffer) {
     return name;
 }
 
-map<string, string> XmlFragmentParser::parseAttributes(XmlBuffer& buffer) {
+map<string, string> XmlFragmentParser::parseAttributes() {
     map<string, string>attributes { };
 
-    while (buffer.canRead()) {
-        buffer.skipWhiteSpace();
+    while (_buffer.canRead()) {
+        _buffer.skipWhiteSpace();
 
-        auto c = buffer.peek();
+        auto c = _buffer.peek();
         
         // Check for end of tag
         if (c == '>' || c == '/' || c == '?') {
@@ -62,52 +67,51 @@ map<string, string> XmlFragmentParser::parseAttributes(XmlBuffer& buffer) {
         }
 
         // Read attribute name
-        string attrName { parseName(buffer) };        
+        string attrName { parseName() };        
         if (attrName.empty()) {
             break;
         }
 
-        buffer.skipWhiteSpace();
+        _buffer.skipWhiteSpace();
 
         // Expect '='
-        if (!buffer.canRead() || buffer.read() != '=') {
+        if (!_buffer.canRead() || _buffer.read() != '=') {
             throw runtime_error("Expected '=' after attribute name");
         }
 
-        buffer.skipWhiteSpace();
+        _buffer.skipWhiteSpace();
 
         // Read attribute value
-        string attrValue { readAttributeValue(buffer) };
-
+        string attrValue { parseAttributeValue() };
         attributes[attrName] = attrValue;
     }
 
     return attributes;
 }
 
-string XmlFragmentParser::readAttributeValue(XmlBuffer& buffer) {
-    if (!buffer.canRead()) {
+string XmlFragmentParser::parseAttributeValue() {
+    if (!_buffer.canRead()) {
         throw runtime_error("Expected attribute value");
     }
 
-    auto quote = buffer.read();    
+    auto quote = _buffer.read();    
     if (quote != '"' && quote != '\'') {
         throw runtime_error("Attribute value must be quoted");
     }
 
     string value { };
-    while (buffer.canRead()) {
-        auto c = buffer.read();        
+    while (_buffer.canRead()) {
+        auto c = _buffer.read();        
         if (c == quote) {
             break;
         } else if (c == '&') {
             // Handle entity references
             string entity { };
-            while (buffer.canRead() && buffer.peek() != ';') {
-                entity += buffer.read();
+            while (_buffer.canRead() && _buffer.peek() != ';') {
+                entity += _buffer.read();
             }
-            if (buffer.canRead()) {
-                buffer.read(); // consume ';'
+            if (_buffer.canRead()) {
+                _buffer.read(); // consume ';'
             }
             
             // Decode common entities

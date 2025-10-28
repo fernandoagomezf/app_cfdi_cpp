@@ -17,15 +17,20 @@ namespace cfdi {
     class XmlFragmentParser {
         public:
             virtual ~XmlFragmentParser() = default;
-            virtual XmlNode parse(XmlBuffer& buffer) = 0;
+            virtual XmlNode parse() = 0;
 
         protected:
-            XmlFragmentParser();
+            explicit XmlFragmentParser(XmlBuffer& buffer);
 
-            string parseName(XmlBuffer& buffer);
-            map<string, string> parseAttributes(XmlBuffer& buffer);
-            string readAttributeValue(XmlBuffer& buffer);
+            XmlBuffer& getBuffer();
+        
+            string parseName();
+            map<string, string> parseAttributes();
+            string parseAttributeValue();
             pair<string, string> splitQualifiedName(string_view name) const;
+        
+        private:
+            XmlBuffer& _buffer;
     };
 }
 

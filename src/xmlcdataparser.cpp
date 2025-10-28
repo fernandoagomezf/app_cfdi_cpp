@@ -10,7 +10,15 @@ using cfdi::XmlFragmentParser;
 using cfdi::XmlNode;
 using cfdi::XmlNodeType;
 
-XmlNode XmlCDataParser::parse(XmlBuffer& buffer) {
+XmlCDataParser::XmlCDataParser(XmlBuffer& buffer)
+    : XmlFragmentParser(buffer) 
+{
+
+}
+
+XmlNode XmlCDataParser::parse() {
+    auto& buffer { getBuffer() };
+
     // Expect "<![CDATA["
     string expected = { "[CDATA[" };
     for (auto expectedChar : expected) {

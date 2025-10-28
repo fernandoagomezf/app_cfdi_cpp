@@ -9,17 +9,26 @@ using cfdi::XmlFragmentParser;
 using cfdi::XmlNode;
 using cfdi::XmlNodeType;
 
-XmlNode XmlElementParser::parse(XmlBuffer& buffer) {
+XmlElementParser::XmlElementParser(XmlBuffer& buffer)
+    : XmlFragmentParser(buffer)
+{
+
+}
+
+XmlNode XmlElementParser::parse() {
+    auto& buffer { getBuffer() };
+
     if (buffer.peek() == '/') {
         buffer.consume();
-        return parseElementEnd(buffer);
+        return parseElementEnd();
     } else {
-        return parseElementStart(buffer);
+        return parseElementStart();
     }
 }
 
-XmlNode XmlElementParser::parseElementStart(XmlBuffer& buffer){
-    string name { parseName(buffer) };
+XmlNode XmlElementParser::parseElementStart(){
+    auto& buffer { getBuffer() };
+    string name { parseName() };
     bool isEmpty { false };
     
     if (name.empty()) {
@@ -27,7 +36,7 @@ XmlNode XmlElementParser::parseElementStart(XmlBuffer& buffer){
     }
 
     // Parse attributes
-    auto attributes = parseAttributes(buffer);
+    auto attributes = parseAttributes();
     buffer.skipWhiteSpace();
 
     // Check for empty element
@@ -54,8 +63,9 @@ XmlNode XmlElementParser::parseElementStart(XmlBuffer& buffer){
     return node;
 }
 
-XmlNode XmlElementParser::parseElementEnd(XmlBuffer& buffer){
-    string name { parseName(buffer) };
+XmlNode XmlElementParser::parseElementEnd(){
+    auto& buffer { getBuffer() };
+    string name { parseName() };
         
     if (name.empty()) {
         throw runtime_error("Invalid end element name");

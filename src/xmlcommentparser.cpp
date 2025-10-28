@@ -9,7 +9,15 @@ using cfdi::XmlFragmentParser;
 using cfdi::XmlNode;
 using cfdi::XmlNodeType;
 
-XmlNode XmlCommentParser::parse(XmlBuffer& buffer) {
+XmlCommentParser::XmlCommentParser(XmlBuffer& buffer)
+    : XmlFragmentParser(buffer)
+{
+    
+}
+
+XmlNode XmlCommentParser::parse() {
+    auto& buffer { getBuffer() };
+
     // Expect "<!--"
     if (buffer.read() != '-' || !buffer.canRead() || buffer.read() != '-') {
         throw runtime_error("Invalid comment syntax");

@@ -12,11 +12,12 @@ namespace cfdi {
 
     class XmlElementParser : public XmlFragmentParser {
         public:
-            virtual XmlNode parse(XmlBuffer& buffer) final;
+            explicit XmlElementParser(XmlBuffer& buffer);
+            virtual XmlNode parse() final;
 
         private:
-            XmlNode parseElementStart(XmlBuffer& buffer);
-            XmlNode parseElementEnd(XmlBuffer& buffer);
+            XmlNode parseElementStart();
+            XmlNode parseElementEnd();
     };
 }
 

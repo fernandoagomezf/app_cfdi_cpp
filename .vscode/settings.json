@@ -10,6 +10,7 @@
         "xlocbuf": "cpp",
         "xlocale": "cpp",
         "stdexcept": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "istream": "cpp"
     }
 }

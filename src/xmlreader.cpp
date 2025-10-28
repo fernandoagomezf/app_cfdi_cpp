@@ -150,8 +150,8 @@ bool XmlReader::readInternal() {
 }
 
 void XmlReader::parseElement() {
-    XmlElementParser parser { };
-    XmlNode node { parser.parse(_buffer) };
+    XmlElementParser parser { _buffer };
+    XmlNode node { parser.parse() };
     
     _nodeType = node.nodeType;
     _name = node.name;
@@ -165,8 +165,8 @@ void XmlReader::parseElement() {
 }
 
 void XmlReader::parseText() {
-    XmlTextParser parser { };
-    XmlNode node { parser.parse(_buffer) };
+    XmlTextParser parser { _buffer };
+    XmlNode node { parser.parse() };
     
     _nodeType = node.nodeType;
     _name = node.name;
@@ -174,8 +174,8 @@ void XmlReader::parseText() {
 }
 
 void XmlReader::parseComment() {
-    XmlCommentParser parser { };
-    XmlNode node { parser.parse(_buffer) };
+    XmlCommentParser parser { _buffer };
+    XmlNode node { parser.parse() };
 
     _nodeType = node.nodeType;
     _name = node.name;
@@ -183,8 +183,8 @@ void XmlReader::parseComment() {
 }
 
 void XmlReader::parseCDATA() {
-    XmlCDataParser parser { };
-    XmlNode node { parser.parse(_buffer) };
+    XmlCDataParser parser { _buffer };
+    XmlNode node { parser.parse() };
 
     _nodeType = node.nodeType;
     _name = node.name;
@@ -192,8 +192,8 @@ void XmlReader::parseCDATA() {
 }
 
 void XmlReader::parseProcessingInstruction() {
-    XmlProcessingInstructionParser parser { };
-    XmlNode node { parser.parse(_buffer) };
+    XmlProcessingInstructionParser parser { _buffer };
+    XmlNode node { parser.parse() };
     
     _nodeType = node.nodeType;
     _name = node.name;
@@ -201,8 +201,8 @@ void XmlReader::parseProcessingInstruction() {
 }
 
 void XmlReader::parseXmlDeclaration() {
-    XmlDeclarationParser parser { };
-    XmlNode node { parser.parse(_buffer) };
+    XmlDeclarationParser parser { _buffer };
+    XmlNode node { parser.parse() };
 
     _nodeType = node.nodeType;
     _name = node.name;
@@ -211,8 +211,8 @@ void XmlReader::parseXmlDeclaration() {
 }
 
 void XmlReader::parseDocumentType() {
-    XmlDeclarationParser parser { };
-    XmlNode node { parser.parse(_buffer) };
+    XmlDeclarationParser parser { _buffer };
+    XmlNode node { parser.parse() };
 
     _nodeType = node.nodeType;
     _name = node.name;

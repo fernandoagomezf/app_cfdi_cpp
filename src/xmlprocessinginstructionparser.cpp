@@ -9,8 +9,15 @@ using cfdi::XmlNode;
 using cfdi::XmlNodeType;
 using cfdi::XmlProcessingInstructionParser;
 
-XmlNode XmlProcessingInstructionParser::parse(XmlBuffer& buffer) {
-    string target = { parseName(buffer) };
+XmlProcessingInstructionParser::XmlProcessingInstructionParser(XmlBuffer& buffer)
+    : XmlFragmentParser(buffer)
+{
+
+}
+
+XmlNode XmlProcessingInstructionParser::parse() {
+    auto& buffer { getBuffer() };
+    string target = { parseName() };
     
     if (target.empty()) {
         throw runtime_error("Invalid processing instruction target");

@@ -7,7 +7,14 @@ using cfdi::XmlNode;
 using cfdi::XmlNodeType;
 using cfdi::XmlTextParser;
 
-XmlNode XmlTextParser::parse(XmlBuffer& buffer) {
+XmlTextParser::XmlTextParser(XmlBuffer& buffer)
+    : XmlFragmentParser(buffer)
+{
+
+}
+
+XmlNode XmlTextParser::parse() {
+    auto& buffer { getBuffer() };
     string text { };    
     while (buffer.canRead() && buffer.peek() != '<') {
         auto c = buffer.read();

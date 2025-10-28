@@ -12,7 +12,8 @@ namespace cfdi {
 
     class XmlCDataParser : public XmlFragmentParser {
         public:
-            virtual XmlNode parse(XmlBuffer& buffer) final;
+            explicit XmlCDataParser(XmlBuffer& buffer);
+            virtual XmlNode parse() final;
     };
 }
 

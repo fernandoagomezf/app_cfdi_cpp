@@ -9,7 +9,15 @@ using cfdi::XmlFragmentParser;
 using cfdi::XmlNode;
 using cfdi::XmlNodeType;
 
-XmlNode XmlDocTypeParser::parse(XmlBuffer& buffer) {
+XmlDocTypeParser::XmlDocTypeParser(XmlBuffer& buffer)
+    : XmlFragmentParser(buffer) 
+{
+
+}
+
+XmlNode XmlDocTypeParser::parse() {
+    auto& buffer { getBuffer() };
+
     // Expect "<!DOCTYPE"
     string doctype = "DOCTYPE";
     for (char c : doctype) {

@@ -9,12 +9,20 @@ using cfdi::XmlFragmentParser;
 using cfdi::XmlNode;
 using cfdi::XmlNodeType;
 
-XmlNode XmlDeclarationParser::parse(XmlBuffer& buffer) {
+XmlDeclarationParser::XmlDeclarationParser(XmlBuffer& buffer)
+    : XmlFragmentParser(buffer) 
+{
+
+}
+
+XmlNode XmlDeclarationParser::parse() {
+    auto& buffer { getBuffer() };
+
     // We're already past "<?xml"    
     buffer.consume(3);
 
     // Parse attributes (version, encoding, standalone)
-    auto attributes { parseAttributes(buffer) };
+    auto attributes { parseAttributes() };
     buffer.skipWhiteSpace();
 
     // Expect "?>"
