@@ -96,8 +96,7 @@ bool XmlReader::read() {
                 throw runtime_error("Invalid XML syntax");
             }
         } else if (next == '?') {
-            _buffer.consume(); // consume '?'
-            
+            _buffer.consume(); // consume '?'            
             if (_buffer.position() + 3 <= _buffer.length() && _buffer.substr(3) == "xml") {                
                 parser = make_unique<XmlDeclarationParser>(_buffer);                
             } else {
