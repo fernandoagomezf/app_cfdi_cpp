@@ -30,8 +30,6 @@ namespace cfdi {
             XmlNode current() const;
 
         private:
-            
-
             bool readInternal();            
             void parseElement();
             void parseText();
@@ -40,12 +38,7 @@ namespace cfdi {
             void parseProcessingInstruction();
             void parseXmlDeclaration();
             void parseDocumentType();
-            void parseAttributes();
-            string readName();
-            string readAttributeValue();
-            void setNodeInfo(XmlNodeType type, const string& name, const string& value);
-            void splitQualifiedName(const string& qualifiedName, string& prefix, string& localName);
-
+            
             XmlBuffer _buffer;
             bool _eof;
             
