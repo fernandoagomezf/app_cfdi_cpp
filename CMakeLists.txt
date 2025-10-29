@@ -9,7 +9,16 @@ project(CFDI
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+# Force static linking
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+set(wxWidgets_USE_STATIC ON)
+set(Boost_USE_STATIC_LIBS ON)
+set(Boost_USE_STATIC_RUNTIME ON)
+
 find_package(Boost REQUIRED COMPONENTS uuid)
+find_package(wxWidgets REQUIRED COMPONENTS core base OPTIONAL_COMPONENTS net gl)
+
+include(${wxWidgets_USE_FILE})
 
 add_library(CFDILib STATIC
     src/document.cpp
@@ -33,7 +42,11 @@ target_include_directories(CFDILib PUBLIC include)
 target_link_libraries(CFDILib PRIVATE Boost::uuid)
 target_compile_features(CFDILib PUBLIC cxx_std_23)
 
-add_executable(CFDI
-    src/program.cpp
+add_executable(CFDI WIN32
+    src/application.cpp
+    src/window.cpp
 )
 target_link_libraries(CFDI PUBLIC CFDILib)
+target_link_libraries(CFDI PRIVATE ${wxWidgets_LIBRARIES})
+target_compile_features(CFDI PUBLIC cxx_std_23)
+

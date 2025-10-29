@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include <fstream>
 #include <filesystem>
@@ -6,6 +7,7 @@
 #include <stdexcept>
 #include "document.hpp"
 #include "directoryscanner.hpp"
+#include "summary.hpp"
 #include "output.hpp"
 #include "utilities.hpp"
 
@@ -22,11 +24,9 @@ using std::ostringstream;
 using std::runtime_error;
 using std::string;
 using cfdi::csv;
-using cfdi::json;
 using cfdi::DirectoryScanner;
 using cfdi::Document;
 using cfdi::Summary;
-using cfdi::xml;
 
 int main() {
     locale esmx { "es_MX.UTF-8" };
@@ -48,7 +48,7 @@ int main() {
         
         ofstream csvFile { format("{0}/cfdis.csv", path) };        
         csvFile << "\xEF\xBB\xBF"; // UTF-8 byte order mark para que Excel reconozca el archivo
-        csvFile << "Fecha,Descripción,RFC,Factura,SubTotal,IVA,Total" << endl;
+        csvFile << csv << "Fecha,Descripción,RFC,Factura,SubTotal,IVA,Total" << endl;
 
         for (auto it = scanner.begin(); it != scanner.end(); ++it) {
             ifstream cfdiFile { *it };
@@ -62,7 +62,7 @@ int main() {
 
                     Document doc { Document::fromXml(str) };
                     Summary summary { doc.summarize() };
-                    csvFile << csv << summary << endl;
+                    csvFile << summary << endl;
                 } catch (const runtime_error& ex) {
                     cout << format("*** Error: no se pudo procesar el archivo {0}", it->string()) << endl;
                     cout << format("*** Motivo: {0}", ex.what()) << endl;
@@ -78,9 +78,9 @@ int main() {
         cout << format("*** Error inesperado, el programa será abortado: {0} ***", ex.what()) << endl;
     }
 
-    println(cout, "\n=== FIN ===");
-    print(cout, "\nPresione 'Enter' para continuar...");
+    cout << "\n=== FIN ===" << endl;
+    cout << "\nPresione 'Enter' para continuar...";
+    cin.get();
 
     return 0;
 }
-
