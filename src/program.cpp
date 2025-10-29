@@ -46,8 +46,9 @@ int main() {
         auto found = scanner.scan(path);
         cout << format("Se encontraron {0} archivos. ", found) << endl;
         
-        ofstream csvFile { format("{0}/cfdis.csv", path) };
-        csvFile << csv << "Fecha,Descripción,RFC,Factura,SubTotal,IVA,Total" << endl;
+        ofstream csvFile { format("{0}/cfdis.csv", path) };        
+        csvFile << "\xEF\xBB\xBF"; // UTF-8 byte order mark para que Excel reconozca el archivo
+        csvFile << "Fecha,Descripción,RFC,Factura,SubTotal,IVA,Total" << endl;
 
         for (auto it = scanner.begin(); it != scanner.end(); ++it) {
             ifstream cfdiFile { *it };
