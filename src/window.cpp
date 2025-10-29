@@ -39,15 +39,15 @@ Window::Window()
 
 void Window::initMenu() {
     wxMenu* menuFile = new wxMenu { };
-    menuFile->Append(Commands::Open, "&Abrir...\tCtrl+A", "Escanea un directorio buscando archivos CFDI.");
-    menuFile->Append(Commands::Save, "&Guardar...\tCtrl+G", "Exporta el condensado de CFDIs en un archivo CSV.");
+    menuFile->Append(Commands::Open, wxString::FromUTF8("&Abrir...\tCtrl+A"), wxString::FromUTF8("Escanea un directorio buscando archivos CFDI."));
+    menuFile->Append(Commands::Save, wxString::FromUTF8("&Guardar...\tCtrl+G"), wxString::FromUTF8("Exporta el condensado de CFDIs en un archivo CSV."));
     menuFile->AppendSeparator();
-    menuFile->Append(wxID_EXIT, "&Salir"); 
+    menuFile->Append(wxID_EXIT, wxString::FromUTF8("&Salir")); 
     wxMenu* menuHelp = new wxMenu { };
-    menuHelp->Append(wxID_ABOUT, "A&cerca de..."); 
+    menuHelp->Append(wxID_ABOUT, wxString::FromUTF8("A&cerca de...")); 
     wxMenuBar* menuBar = new wxMenuBar { };
-    menuBar->Append(menuFile, "&Archivo");
-    menuBar->Append(menuHelp, "&Ayuda"); 
+    menuBar->Append(menuFile, wxString::FromUTF8("&Archivo"));
+    menuBar->Append(menuHelp, wxString::FromUTF8("&Ayuda")); 
     SetMenuBar(menuBar);
 
     Bind(wxEVT_MENU, &Window::onOpen, this, Commands::Open);
@@ -58,7 +58,7 @@ void Window::initMenu() {
 
 void Window::initStatusBar() {
     CreateStatusBar();
-    SetStatusText("Listo para procesar CFDIs");
+    SetStatusText(wxString::FromUTF8("Listo para procesar CFDIs"));
 }
 
 void Window::initToolBar() {
@@ -69,25 +69,25 @@ void Window::initGrid() {
     _grid = new wxGrid { this, wxID_ANY };    
     _grid->CreateGrid(0, 7); 
     
-    _grid->SetColLabelValue(0, "Fecha");
-    _grid->SetColLabelValue(1, "Descripción");
-    _grid->SetColLabelValue(2, "RFC Emisor");
-    _grid->SetColLabelValue(3, "No. Factura");
-    _grid->SetColLabelValue(4, "SubTotal");
-    _grid->SetColLabelValue(5, "IVA");
-    _grid->SetColLabelValue(6, "Total");
+    _grid->SetColLabelValue(0, wxString::FromUTF8("Fecha"));
+    _grid->SetColLabelValue(1, wxString::FromUTF8("Descripción"));
+    _grid->SetColLabelValue(2, wxString::FromUTF8("RFC Emisor"));
+    _grid->SetColLabelValue(3, wxString::FromUTF8("No. Factura"));
+    _grid->SetColLabelValue(4, wxString::FromUTF8("SubTotal"));
+    _grid->SetColLabelValue(5, wxString::FromUTF8("IVA"));
+    _grid->SetColLabelValue(6, wxString::FromUTF8("Total"));
     
-    _grid->SetColSize(0, 100);  // Fecha
-    _grid->SetColSize(1, 200);  // Descripción (wider for longer text)
+    _grid->SetColSize(0, 120);  // Fecha
+    _grid->SetColSize(1, 250);  // Descripción (wider for longer text)
     _grid->SetColSize(2, 120);  // RFC Emisor
-    _grid->SetColSize(3, 120);  // No. Factura
+    _grid->SetColSize(3, 250);  // No. Factura
     _grid->SetColSize(4, 100);  // SubTotal
-    _grid->SetColSize(5, 80);   // IVA
+    _grid->SetColSize(5, 100);   // IVA
     _grid->SetColSize(6, 100);  // Total    
     _grid->EnableEditing(false);
     
     // Create sizer and add grid
-    wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+    wxBoxSizer* sizer = new wxBoxSizer { wxVERTICAL };
     sizer->Add(_grid, 1, wxEXPAND | wxALL, 5);
     SetSizer(sizer);
 }
@@ -110,7 +110,7 @@ void Window::populateGrid() {
         _grid->SetCellValue(row, 6, wxString::FromUTF8(summary.total));
     }
     
-    _grid->AutoSize();
+    //_grid->AutoSize();
 }
 
 void Window::onExit(wxCommandEvent& e) {
@@ -118,12 +118,12 @@ void Window::onExit(wxCommandEvent& e) {
 }
 
 void Window::onAbout(wxCommandEvent& e) {
-    wxMessageBox("Blendwerk Procesador de CFDI v0.1.0\n\nAplicación para procesar archivos CFDI y exportar resúmenes.", 
-                 "Acerca de", wxOK | wxICON_INFORMATION);
+    wxMessageBox(wxString::FromUTF8("Blendwerk Procesador de CFDI v0.1.0\n\nAplicación para procesar archivos CFDI y exportar resúmenes."), 
+                 wxString::FromUTF8("Acerca de"), wxOK | wxICON_INFORMATION);
 }
 
 void Window::onOpen(wxCommandEvent& e) {
-    wxDirDialog dirDialog { this, "Seleccionar directorio con archivos CFDI", "",  wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST };
+    wxDirDialog dirDialog { this, wxString::FromUTF8("Seleccionar directorio con archivos CFDI"), "",  wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST };
     
     if (dirDialog.ShowModal() == wxID_CANCEL) {
         return;
@@ -131,7 +131,8 @@ void Window::onOpen(wxCommandEvent& e) {
     
     wxString selectedPath { dirDialog.GetPath() };    
     if (!wxDirExists(selectedPath)) {
-        wxMessageBox("La ruta seleccionada no es un directorio válido.", "Error", wxOK | wxICON_ERROR);
+        wxMessageBox(wxString::FromUTF8("La ruta seleccionada no es un directorio válido."), 
+                    wxString::FromUTF8("Error"), wxOK | wxICON_ERROR);
         return;
     }
     
@@ -141,7 +142,8 @@ void Window::onOpen(wxCommandEvent& e) {
         auto found = scanner.scan(pathStr);
         
         if (found == 0) {
-            wxMessageBox("No se encontraron archivos CFDI en el directorio seleccionado.", "Sin Archivos", wxOK | wxICON_WARNING);
+            wxMessageBox(wxString::FromUTF8("No se encontraron archivos CFDI en el directorio seleccionado."), 
+                        wxString::FromUTF8("Sin Archivos"), wxOK | wxICON_WARNING);
             return;
         }
         
@@ -179,7 +181,8 @@ void Window::onOpen(wxCommandEvent& e) {
 
 void Window::onSave(wxCommandEvent& e) {
     if (_summaries.empty()) {
-        wxMessageBox("No hay datos para exportar. Primero escanee un directorio con archivos CFDI.", "Sin Datos", wxOK | wxICON_WARNING);
+        wxMessageBox(wxString::FromUTF8("No hay datos para exportar. Primero escanee un directorio con archivos CFDI."), 
+                    wxString::FromUTF8("Sin Datos"), wxOK | wxICON_WARNING);
         return;
     }
     
@@ -187,24 +190,23 @@ void Window::onSave(wxCommandEvent& e) {
                         "Archivos JSON (*.json)|*.json|"
                         "Archivos XML (*.xml)|*.xml";
     
-    wxFileDialog saveDialog { this, "Exportar resumen de CFDIs", "", "cfdis_resumen.csv", wildcard, wxFD_SAVE | wxFD_OVERWRITE_PROMPT };    
+    wxFileDialog saveDialog { this, wxString::FromUTF8("Exportar resumen de CFDIs"), "", "cfdis_resumen.csv", wildcard, wxFD_SAVE | wxFD_OVERWRITE_PROMPT };    
     if (saveDialog.ShowModal() == wxID_CANCEL) {
         return;
     }
     
     wxString filePath { saveDialog.GetPath() };
     int filterIndex { saveDialog.GetFilterIndex() };
-    
-    wxMessageBox(wxString::Format("Archivo a exportar:\n%s", filePath), "Archivo Seleccionado", wxOK | wxICON_INFORMATION);
-    
+        
     try {
         ofstream file { filePath.ToStdString() };
         if (!file.is_open()) {
-            wxMessageBox("No se pudo crear el archivo de exportación.", "Error", wxOK | wxICON_ERROR);
+            wxMessageBox(wxString::FromUTF8("No se pudo crear el archivo de exportación."), 
+                        wxString::FromUTF8("Error"), wxOK | wxICON_ERROR);
             return;
         }
         
-        file << "\xEF\xBB\xBF";        
+        file << "\xEF\xBB\xBF"; // necesario para que excel abra el archivo con UTF-8
         switch (filterIndex) {
             case 0: // CSV
                 for (const auto& summary : _summaries) {
