@@ -3,6 +3,7 @@
 
 #include <list>
 #include <string>
+#include <iostream>
 #include "cfdiheader.hpp"
 #include "cfdiissuer.hpp"
 #include "cfdireceiver.hpp"
@@ -12,6 +13,7 @@
 #include "summary.hpp"
 
 namespace cfdi {
+    using std::istream;
     using std::list;
     using std::string;
     using std::string_view;

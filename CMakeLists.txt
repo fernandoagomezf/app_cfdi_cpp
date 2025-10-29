@@ -13,6 +13,7 @@ find_package(Boost REQUIRED COMPONENTS uuid)
 
 add_library(CFDILib STATIC
     src/document.cpp
+    src/summary.cpp
     src/xmlnode.cpp
     src/xmlreader.cpp
     src/xmlbuffer.cpp
@@ -26,6 +27,7 @@ add_library(CFDILib STATIC
     src/xmlelementparser.cpp
     src/directoryscanner.cpp
     src/utilities.cpp
+    src/output.cpp
 )
 target_include_directories(CFDILib PUBLIC include)
 target_link_libraries(CFDILib PRIVATE Boost::uuid)

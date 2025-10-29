@@ -6,61 +6,62 @@
 #include <stdexcept>
 #include "document.hpp"
 #include "directoryscanner.hpp"
+#include "output.hpp"
 #include "utilities.hpp"
 
 using std::cout;
 using std::cin;
-using std::ifstream;
-using std::filesystem::current_path;
-using std::locale;
-using std::ostringstream;
+using std::endl;
 using std::exception;
+using std::filesystem::current_path;
 using std::format;
+using std::ifstream;
+using std::locale;
+using std::ofstream;
+using std::ostringstream;
 using std::runtime_error;
 using std::string;
-using std::println;
-using std::endl;
+using cfdi::csv;
+using cfdi::json;
+using cfdi::DirectoryScanner;
 using cfdi::Document;
 using cfdi::Summary;
-using cfdi::DirectoryScanner;
-
-void logo();
+using cfdi::xml;
 
 int main() {
     locale esmx { "es_MX.UTF-8" };
     locale::global(esmx);
     cout.imbue(esmx);
 
-    println(cout, "=== Blendwerk Procesador de CFDI v0.1 ===\n");
+    cout << "=== Blendwerk Procesador de CFDI v0.1 ===" << endl;
+    cout << endl;    
     
     try {
-        DirectoryScanner scanner { };
+        cout << "Ingrese el directorio donde se encuentran sus CFDIs> " << endl;
+        string path;
+        cin >> path;
+        cout << endl;
 
-        cout << format("Buscando archivos CFDI...") << endl;
-        auto found = scanner.scan("data/");
+        DirectoryScanner scanner { };
+        auto found = scanner.scan(path);
         cout << format("Se encontraron {0} archivos. ", found) << endl;
+        
+        ofstream csvFile { format("{0}/cfdis.csv", path) };
+        csvFile << csv << "Fecha,Descripción,RFC,Factura,SubTotal,IVA,Total" << endl;
 
         for (auto it = scanner.begin(); it != scanner.end(); ++it) {
-            ifstream file(*it);
-            if (file.is_open()){
+            ifstream cfdiFile { *it };
+            if (cfdiFile.is_open()){
                 ostringstream ss { };
-                ss << file.rdbuf();
-                auto xml { ss.str() };
+                ss << cfdiFile.rdbuf();
+                auto str { ss.str() };
 
                 try {
-                    cout << format("== Procesando archivo {0} ==", it->string()) << endl;
+                    cout << format("\tProcesando archivo {0} ==", it->string()) << endl;
 
-                    Document doc { Document::fromXml(xml) };
+                    Document doc { Document::fromXml(str) };
                     Summary summary { doc.summarize() };
-
-                    cout << format("\t Fecha: \t\t{0}", summary.date) << endl;;
-                    cout << format("\t Descripción: \t\t{0}", summary.description) << endl;
-                    cout << format("\t RFC: \t\t\t{0}", summary.issuerTaxCode) << endl;
-                    cout << format("\t No. Factura: \t\t{0}", summary.invoiceId) << endl;
-                    cout << format("\t Sub Total: \t\t{0}", summary.subTotal) << endl;
-                    cout << format("\t IVA: \t\t\t{0}", summary.taxes) << endl;
-                    cout << format("\t Total: \t\t{0}", summary.total) << endl;
-                    cout << endl;
+                    csvFile << csv << summary << endl;
                 } catch (const runtime_error& ex) {
                     cout << format("*** Error: no se pudo procesar el archivo {0}", it->string()) << endl;
                     cout << format("*** Motivo: {0}", ex.what()) << endl;
@@ -69,15 +70,15 @@ int main() {
                 cout << format("*** Error: no se pudo abrir el archivo CFDI: {0} ***", it->string());
             }
         }
+        csvFile << endl;
+        cout << "Archivos procesados con éxito." << endl;
+
     } catch (const exception& ex) {
         cout << format("*** Error inesperado, el programa será abortado: {0} ***", ex.what()) << endl;
     }
 
     println(cout, "\n=== FIN ===");
     print(cout, "\nPresione 'Enter' para continuar...");
-    cin.get();
-
-    cfdi::about(cout);
 
     return 0;
 }
