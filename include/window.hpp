@@ -2,21 +2,37 @@
 #define _WINDOW_HPP_
 
 #include <wx/wx.h>
+#include <wx/grid.h>
+#include <wx/dirdlg.h>
+#include <wx/filedlg.h>
+#include <vector>
+#include "summary.hpp"
 
 namespace cfdi {
-    class Window : public wxFrame {
+    using std::vector;
+
+    class Window final : public wxFrame {
         public:
             Window();
 
         private:
             enum Commands {
-                Scan, Export
+                Open, Save
             };
 
-            void OnExit(wxCommandEvent& event);
-            void OnAbout(wxCommandEvent& event);
-            void OnScan(wxCommandEvent& event);
-            void OnExport(wxCommandEvent& event);
+            void onExit(wxCommandEvent& event);
+            void onAbout(wxCommandEvent& event);
+            void onOpen(wxCommandEvent& event);
+            void onSave(wxCommandEvent& event);
+            
+            void initGrid();
+            void initMenu();
+            void initStatusBar();
+            void initToolBar();
+            void populateGrid();
+            
+            wxGrid* _grid;
+            vector<Summary> _summaries;
     };
 }
 
