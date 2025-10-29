@@ -5,6 +5,8 @@
 #include <wx/msgdlg.h>
 #include <wx/dirdlg.h>
 #include <wx/filedlg.h>
+#include <wx/toolbar.h>
+#include <wx/artprov.h>
 #include <fstream>
 #include <sstream>
 #include <filesystem>
@@ -62,7 +64,22 @@ void Window::initStatusBar() {
 }
 
 void Window::initToolBar() {
-
+    wxToolBar* toolbar { CreateToolBar(wxTB_HORIZONTAL | wxTB_TEXT | wxTB_FLAT) };
+    
+    toolbar->SetToolBitmapSize(wxSize(24, 24));    
+    toolbar->AddTool(Commands::Open, 
+                    wxString::FromUTF8("Abrir"), 
+                    wxArtProvider::GetBitmap(wxART_FILE_OPEN, wxART_TOOLBAR, wxSize(24, 24)),
+                    wxString::FromUTF8("Escanear directorio con archivos CFDI"));
+    toolbar->AddSeparator();    
+    toolbar->AddTool(Commands::Save, 
+                    wxString::FromUTF8("Guardar"), 
+                    wxArtProvider::GetBitmap(wxART_FILE_SAVE, wxART_TOOLBAR, wxSize(24, 24)),
+                    wxString::FromUTF8("Exportar resumen de CFDIs"));    
+    toolbar->Realize();
+    
+    Bind(wxEVT_TOOL, &Window::onOpen, this, Commands::Open);
+    Bind(wxEVT_TOOL, &Window::onSave, this, Commands::Save);
 }
 
 void Window::initGrid() {
@@ -77,16 +94,15 @@ void Window::initGrid() {
     _grid->SetColLabelValue(5, wxString::FromUTF8("IVA"));
     _grid->SetColLabelValue(6, wxString::FromUTF8("Total"));
     
-    _grid->SetColSize(0, 120);  // Fecha
-    _grid->SetColSize(1, 250);  // Descripción (wider for longer text)
-    _grid->SetColSize(2, 120);  // RFC Emisor
-    _grid->SetColSize(3, 250);  // No. Factura
-    _grid->SetColSize(4, 100);  // SubTotal
-    _grid->SetColSize(5, 100);   // IVA
-    _grid->SetColSize(6, 100);  // Total    
+    _grid->SetColSize(0, 120);
+    _grid->SetColSize(1, 250);
+    _grid->SetColSize(2, 120);
+    _grid->SetColSize(3, 250);
+    _grid->SetColSize(4, 100);
+    _grid->SetColSize(5, 100);
+    _grid->SetColSize(6, 100);
     _grid->EnableEditing(false);
     
-    // Create sizer and add grid
     wxBoxSizer* sizer = new wxBoxSizer { wxVERTICAL };
     sizer->Add(_grid, 1, wxEXPAND | wxALL, 5);
     SetSizer(sizer);
@@ -109,8 +125,6 @@ void Window::populateGrid() {
         _grid->SetCellValue(row, 5, wxString::FromUTF8(summary.taxes));
         _grid->SetCellValue(row, 6, wxString::FromUTF8(summary.total));
     }
-    
-    //_grid->AutoSize();
 }
 
 void Window::onExit(wxCommandEvent& e) {
