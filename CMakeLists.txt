@@ -15,7 +15,6 @@ set(wxWidgets_USE_STATIC ON)
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
 
-find_package(Boost REQUIRED COMPONENTS uuid)
 find_package(wxWidgets REQUIRED COMPONENTS core base OPTIONAL_COMPONENTS net gl)
 
 include(${wxWidgets_USE_FILE})
@@ -39,7 +38,6 @@ add_library(CFDILib STATIC
     src/output.cpp
 )
 target_include_directories(CFDILib PUBLIC include)
-target_link_libraries(CFDILib PRIVATE Boost::uuid)
 target_compile_features(CFDILib PUBLIC cxx_std_23)
 
 add_executable(CFDI WIN32
