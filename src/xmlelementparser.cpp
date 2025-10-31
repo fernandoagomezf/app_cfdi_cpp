@@ -1,5 +1,10 @@
-#include "xmlelementparser.hpp"
-#include <stdexcept>
+module cfdi.xml:xmlelementparser;
+
+import std;
+import :xmlbuffer;
+import :xmlfragmentparser;
+import :xmlnode;
+import :xmlelementparser;
 
 using std::runtime_error;
 using std::string;

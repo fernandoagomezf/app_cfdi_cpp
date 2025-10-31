@@ -1,5 +1,10 @@
-#include "xmlnode.hpp"
+module cfdi.xml:xmlnode;
 
+import std;
+import :xmlnodetype;
+import :xmlnode;
+
+using std::string;
 using std::string_view;
 using cfdi::XmlNode;
 

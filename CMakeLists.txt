@@ -20,19 +20,33 @@ find_package(wxWidgets REQUIRED COMPONENTS core base OPTIONAL_COMPONENTS net gl)
 include(${wxWidgets_USE_FILE})
 
 add_library(CFDILib STATIC
+    src/cfdi.xml.ixx
+    src/xmlnodetype.ixx
+    src/xmlnode.ixx
+    src/xmlnode.cpp
+    src/xmlbuffer.ixx
+    src/xmlbuffer.cpp
+    src/xmlfragmentparser.ixx 
+    src/xmlfragmentparser.cpp
+    src/xmlcdataparser.ixx
+    src/xmlcdataparser.cpp
+    src/xmlcommentparser.ixx
+    src/xmlcommentparser.cpp 
+    src/xmldeclarationparser.ixx
+    src/xmldeclarationparser.cpp
+    src/xmldoctypeparser.ixx
+    src/xmldoctypeparser.cpp
+    src/xmlelementparser.ixx
+    src/xmlelementparser.cpp
+    src/xmlprocessinginstructionparser.ixx
+    src/xmlprocessinginstructionparser.cpp
+    src/xmltextparser.ixx
+    src/xmltextparser.cpp
+    src/xmlreader.ixx
+    src/xmlreader.cpp
+
     src/document.cpp
     src/summary.cpp
-    src/xmlnode.cpp
-    src/xmlreader.cpp
-    src/xmlbuffer.cpp
-    src/xmlfragmentparser.cpp
-    src/xmltextparser.cpp
-    src/xmlcommentparser.cpp 
-    src/xmlcdataparser.cpp
-    src/xmlprocessinginstructionparser.cpp
-    src/xmldeclarationparser.cpp
-    src/xmldoctypeparser.cpp
-    src/xmlelementparser.cpp
     src/directoryscanner.cpp
     src/utilities.cpp
     src/output.cpp

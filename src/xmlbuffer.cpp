@@ -1,5 +1,7 @@
-#include "xmlbuffer.hpp"
-#include <stdexcept>
+module cfdi.xml:xmlbuffer;
+
+import std;
+import :xmlbuffer;
 
 using std::invalid_argument;
 using std::size_t;

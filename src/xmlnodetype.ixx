@@ -1,8 +1,7 @@
-#ifndef _XMLNODETYPE_HPP_
-#define _XMLNODETYPE_HPP_
+export module cfdi.xml:xmlnodetype;
 
 namespace cfdi {
-    enum class XmlNodeType {
+    export enum class XmlNodeType {
         None,
         Element,
         EndElement,
@@ -15,5 +14,3 @@ namespace cfdi {
         DocumentType
     };
 }
-
-#endif 

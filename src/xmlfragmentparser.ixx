@@ -1,20 +1,18 @@
-#ifndef _XMLPARSER_HPP_
-#define _XMLPARSER_HPP_
+export module cfdi.xml:xmlfragmentparser;
 
-#include <map>
-#include <string>
-#include <utility>
-#include "xmlnode.hpp"
-#include "xmlbuffer.hpp"
+import std;
+import :xmlnode;
+import :xmlbuffer;
 
 namespace cfdi {
     using std::map;
     using std::pair;
     using std::string;
+    using std::string_view;
     using cfdi::XmlBuffer;
     using cfdi::XmlNode;
 
-    class XmlFragmentParser {
+    export class XmlFragmentParser {
         public:
             virtual ~XmlFragmentParser() = default;
             virtual XmlNode parse() = 0;
@@ -33,5 +31,3 @@ namespace cfdi {
             XmlBuffer& _buffer;
     };
 }
-
-#endif

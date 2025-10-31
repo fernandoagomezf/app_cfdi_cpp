@@ -1,5 +1,10 @@
-#include "xmldoctypeparser.hpp"
-#include <stdexcept>
+module cfdi.xml:xmldoctypeparser;
+
+import std;
+import :xmlbuffer;
+import :xmlfragmentparser;
+import :xmlnode;
+import :xmldoctypeparser;
 
 using std::runtime_error;
 using std::string;

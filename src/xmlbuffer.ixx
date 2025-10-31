@@ -1,14 +1,13 @@
-#ifndef _XMLCHARPROVIDER_HPP_
-#define _XMLCHARPROVIDER_HPP_
+export module cfdi.xml:xmlbuffer;
 
-#include <string>
+import std;
 
 namespace cfdi {
     using std::string;
     using std::string_view;
     using std::size_t;
 
-    class XmlBuffer {
+    export class XmlBuffer {
         public:
             explicit XmlBuffer(string_view);
             XmlBuffer(string_view content, size_t position);
@@ -32,5 +31,3 @@ namespace cfdi {
             size_t _position;
     };
 }
-
-#endif 

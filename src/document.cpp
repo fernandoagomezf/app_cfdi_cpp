@@ -1,5 +1,9 @@
+
+
+import cfdi.xml;
+
 #include "document.hpp"
-#include "xmlreader.hpp"
+//#include "xmlreader.hpp"
 #include <sstream>
 #include <ranges>
 #include <algorithm>

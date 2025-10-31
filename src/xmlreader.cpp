@@ -1,20 +1,24 @@
-#include "xmlreader.hpp"
-#include "xmltextparser.hpp"
-#include "xmlcommentparser.hpp"
-#include "xmlcdataparser.hpp"
-#include "xmlprocessinginstructionparser.hpp"
-#include "xmldeclarationparser.hpp"
-#include "xmldoctypeparser.hpp"
-#include "xmlelementparser.hpp"
-#include <sstream>
-#include <stdexcept>
-#include <memory>
+module cfdi.xml:xmlreader;
 
-using std::unique_ptr;
+import std;
+import :xmlnode;
+import :xmlbuffer;
+import :xmlfragmentparser;
+import :xmlcdataparser;
+import :xmlcommentparser;
+import :xmldeclarationparser;
+import :xmldoctypeparser;
+import :xmlelementparser;
+import :xmlprocessinginstructionparser;
+import :xmltextparser;
+import :xmlreader;
+
+using std::istream;
 using std::make_unique;
 using std::ostringstream;
 using std::runtime_error;
 using std::string_view;
+using std::unique_ptr;
 using cfdi::XmlCDataParser;
 using cfdi::XmlCommentParser;
 using cfdi::XmlDeclarationParser;

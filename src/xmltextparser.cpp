@@ -1,4 +1,10 @@
-#include "xmltextparser.hpp"
+module cfdi.xml:xmltextparser;
+
+import std;
+import :xmlbuffer;
+import :xmlfragmentparser;
+import :xmlnode;
+import :xmltextparser;
 
 using std::string;
 using cfdi::XmlBuffer;

@@ -1,5 +1,10 @@
-#include "xmlcommentparser.hpp"
-#include <stdexcept>
+module cfdi.xml:xmlcommentparser;
+
+import std;
+import :xmlbuffer;
+import :xmlfragmentparser;
+import :xmlnode;
+import :xmlcommentparser;
 
 using std::runtime_error;
 using std::string;

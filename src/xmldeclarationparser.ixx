@@ -1,20 +1,18 @@
-#ifndef _XMLDECLARATIONPARSER_HPP_
-#define _XMLDECLARATIONPARSER_HPP_
+export module cfdi.xml:xmldeclarationparser;
 
-#include "xmlbuffer.hpp"
-#include "xmlnode.hpp"
-#include "xmlfragmentparser.hpp"
+import std;
+import :xmlbuffer;
+import :xmlfragmentparser;
+import :xmlnode;
 
 namespace cfdi {
     using cfdi::XmlBuffer;
     using cfdi::XmlFragmentParser;
     using cfdi::XmlNode;
 
-    class XmlDeclarationParser : public XmlFragmentParser {
+    export class XmlDeclarationParser : public XmlFragmentParser {
         public:
             explicit XmlDeclarationParser(XmlBuffer& buffer);
             virtual XmlNode parse() final;
     };
 }
-
-#endif 

@@ -1,14 +1,8 @@
-#ifndef _XMLREADER_HPP_
-#define _XMLREADER_HPP_
+export module cfdi.xml:xmlreader;
 
-#include <string>
-#include <string_view>
-#include <map>
-#include <memory>
-#include <istream>
-#include "xmlnodetype.hpp"
-#include "xmlnode.hpp"
-#include "xmlbuffer.hpp"
+import std;
+import :xmlnode;
+import :xmlbuffer;
 
 namespace cfdi {
     using std::string;
@@ -16,11 +10,10 @@ namespace cfdi {
     using std::map;
     using std::unique_ptr;
     using std::istream;
-    using cfdi::XmlNodeType;
     using cfdi::XmlNode;
     using cfdi::XmlBuffer;
 
-    class XmlReader {
+    export class XmlReader {
         public:            
             XmlReader(string_view xml);
             XmlReader(istream& stream);
@@ -39,5 +32,3 @@ namespace cfdi {
     };
 
 } 
-
-#endif 

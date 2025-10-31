@@ -1,10 +1,7 @@
-#ifndef _XMLNODE_HPP_
-#define _XMLNODE_HPP_
+export module cfdi.xml:xmlnode;
 
-#include <map>
-#include <string>
-#include <string_view>
-#include "xmlnodetype.hpp"
+import std;
+import :xmlnodetype;
 
 namespace cfdi {
     using std::map;
@@ -12,7 +9,7 @@ namespace cfdi {
     using std::string_view;
     using cfdi::XmlNodeType;
     
-    struct XmlNode {
+    export struct XmlNode {
         XmlNodeType nodeType;
         string name;
         string localName;
@@ -28,5 +25,3 @@ namespace cfdi {
         string_view getAttribute(string_view name) const;
     };
 }
-
-#endif 

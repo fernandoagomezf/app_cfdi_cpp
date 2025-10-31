@@ -1,8 +1,9 @@
-#include "xmlfragmentparser.hpp"
-#include <cmath>
-#include <map>
-#include <string>
-#include <stdexcept>
+module cfdi.xml:xmlfragmentparser;
+
+import std;
+import :xmlbuffer;
+import :xmlnode;
+import :xmlfragmentparser;
 
 using std::isalpha;
 using std::isalnum;

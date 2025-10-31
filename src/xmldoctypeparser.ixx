@@ -1,20 +1,18 @@
-#ifndef _XMLDOCTYPEPARSER_HPP_
-#define _XMLDOCTYPEPARSER_HPP_
+export module cfdi.xml:xmldoctypeparser;
 
-#include "xmlbuffer.hpp"
-#include "xmlnode.hpp"
-#include "xmlfragmentparser.hpp"
+import std;
+import :xmlbuffer;
+import :xmlfragmentparser;
+import :xmlnode;
 
 namespace cfdi {
     using cfdi::XmlBuffer;
     using cfdi::XmlFragmentParser;
     using cfdi::XmlNode;
 
-    class XmlDocTypeParser : public XmlFragmentParser {
+    export class XmlDocTypeParser : public XmlFragmentParser {
         public:
             explicit XmlDocTypeParser(XmlBuffer& buffer);
             virtual XmlNode parse() final;
     };
 }
-
-#endif 
