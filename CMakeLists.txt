@@ -63,6 +63,7 @@ add_library(CFDILib STATIC
     src/cfdidocument.ixx
     src/cfdidocument.cpp
     src/cfdiscanner.ixx
+    src/cfdiscanner.cpp
     )
 target_include_directories(CFDILib PUBLIC include)
 target_compile_features(CFDILib PUBLIC cxx_std_23)

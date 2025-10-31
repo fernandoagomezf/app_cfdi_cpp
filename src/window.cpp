@@ -1,10 +1,14 @@
-module cfdi.app:window;
+module;
 
-import <wx/msgdlg.h>;
-import <wx/dirdlg.h>;
-import <wx/filedlg.h>;
-import <wx/toolbar.h>;
-import <wx/artprov.h>;
+#include <wx/wx.h>
+#include <wx/msgdlg.h>
+#include <wx/dirdlg.h>
+#include <wx/filedlg.h>
+#include <wx/toolbar.h>
+#include <wx/artprov.h>
+#include <wx/grid.h>
+
+module cfdi.app:window;
 
 import std;
 import cfdi.doc;

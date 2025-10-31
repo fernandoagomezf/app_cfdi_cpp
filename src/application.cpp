@@ -1,6 +1,9 @@
+module;
+
+#include <wx/wx.h>
+
 module cfdi.app:application;
 
-import <wx/wx.h>;
 
 import :window;
 import :application;
