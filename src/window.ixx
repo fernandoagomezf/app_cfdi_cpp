@@ -1,17 +1,15 @@
-#ifndef _WINDOW_HPP_
-#define _WINDOW_HPP_
+export module cfdi.app:window;
 
-#include <wx/wx.h>
-#include <wx/grid.h>
-#include <wx/dirdlg.h>
-#include <wx/filedlg.h>
-#include <vector>
-#include "summary.hpp"
+import <wx/wx.h>;
+import <wx/grid.h>;
+
+import std;
+import cfdi.doc;
 
 namespace cfdi {
     using std::vector;
 
-    class Window final : public wxFrame {
+    export class Window final : public wxFrame {
         public:
             Window();
 
@@ -32,8 +30,6 @@ namespace cfdi {
             void populateGrid();
             
             wxGrid* _grid;
-            vector<Summary> _summaries;
+            vector<CFDISummary> _summaries;
     };
 }
-
-#endif

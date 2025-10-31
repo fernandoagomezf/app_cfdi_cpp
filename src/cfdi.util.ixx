@@ -1,12 +1,6 @@
-#ifndef _CFDIALGORITHMS_HPP_
-#define _CFDIALGORITHMS_HPP_
+export module cfdi.util;
 
-#include <string>
-#include <list>
-#include <ranges>
-#include <iostream>
-#include <utility>
-#include <functional>
+import std;
 
 namespace cfdi {
     using std::invoke;
@@ -17,6 +11,7 @@ namespace cfdi {
     using std::ranges::input_range;
     using std::string;
 
+    export
     template <input_range Range, typename T>
     string join(const Range& range, const string& delimiter, T&& transform)
     {
@@ -46,5 +41,3 @@ namespace cfdi {
 
     void about(ostream& out);
 }
-
-#endif 

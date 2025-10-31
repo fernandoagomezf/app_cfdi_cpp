@@ -1,12 +1,11 @@
-#ifndef _CFDITRANSFER_HPP_
-#define _CFDITRANSFER_HPP_
+export module cfdi.doc:cfditransfer;
 
-#include <string>
+import std;
 
 namespace cfdi {
     using std::string;
 
-    struct CFDITransfer {               // cfdi:Traslado
+    export struct CFDITransfer {        // cfdi:Traslado
         string base;                    // cfdi:Traslado - Base
         string code;                    // cfdi:Traslado - Impuesto
         string factorType;              // cfdi:Traslado - TipoFactor
@@ -14,5 +13,3 @@ namespace cfdi {
         string amount;                  // cfdi:Traslado - Importe
     };
 }
-
-#endif 

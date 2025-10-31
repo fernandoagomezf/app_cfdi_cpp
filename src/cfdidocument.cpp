@@ -1,14 +1,15 @@
+module cfdi.doc:cfdidocument;
 
-
+import cfdi.util;
 import cfdi.xml;
-
-#include "document.hpp"
-//#include "xmlreader.hpp"
-#include <sstream>
-#include <ranges>
-#include <algorithm>
-#include <numeric>
-#include "utilities.hpp"
+import :cfdicomplement;
+import :cfdiconcept;
+import :cfdiissuer;
+import :cfdireceiver;
+import :cfditax;
+import :cfdisummary;
+import :cfdidocument;
+import :cfdiwritter;
 
 using std::list;
 using std::ostringstream;
@@ -20,36 +21,37 @@ using cfdi::CFDIHeader;
 using cfdi::CFDIIssuer;
 using cfdi::CFDIReceiver;
 using cfdi::CFDITax;
-using cfdi::Document;
-using cfdi::Summary;
+using cfdi::CFDISummary;
+using cfdi::CFDIDocument;
+using cfdi::CFDIWritter;
 using cfdi::XmlReader;
 using cfdi::join;
 
-const CFDIHeader& Document::header() const {
+const CFDIHeader& CFDIDocument::header() const {
     return _header;
 }
 
-const CFDIIssuer& Document::issuer() const {
+const CFDIIssuer& CFDIDocument::issuer() const {
     return _issuer;
 }
 
-const CFDIReceiver& Document::receiver() const {
+const CFDIReceiver& CFDIDocument::receiver() const {
     return _receiver;
 }
 
-const list<CFDIConcept>& Document::concepts() const {
+const list<CFDIConcept>& CFDIDocument::concepts() const {
     return _concepts;
 }
 
-const CFDITax& Document::taxes() const {
+const CFDITax& CFDIDocument::taxes() const {
     return _taxes;
 }
 
-const CFDIComplement& Document::complement() const {
+const CFDIComplement& CFDIDocument::complement() const {
     return _complement;
 }
 
-Summary Document::summarize() const {
+CFDISummary CFDIDocument::summarize() const {
     return  { 
         .date = _header.date, 
         .description = join(_concepts, ", ", [](const CFDIConcept& c) { return c.description; }),
@@ -61,8 +63,8 @@ Summary Document::summarize() const {
     };
 }
 
-Document Document::fromXml(string_view xml) {
-    Document doc { };
+CFDIDocument CFDIDocument::fromXml(string_view xml) {
+    CFDIDocument doc { };
     
     XmlReader reader { xml };
     while (reader.read()) {
@@ -162,4 +164,10 @@ Document Document::fromXml(string_view xml) {
     return doc;
 }
 
+string CFDIDocument::toCsv() const {
+    CFDIWritter writter { };
+    CFDISummary summary { summarize() };
+    auto csv { writter.writeCsv(summary) };
+    return csv;
+}
 

@@ -1,12 +1,11 @@
-#ifndef _CFDIRECEIVER_HPP_
-#define _CFDIRECEIVER_HPP_
+export module cfdi.doc:cfdireceiver;
 
-#include <string>
+import std;
 
 namespace cfdi {
     using std::string;
     
-    struct CFDIReceiver {               // cfdi:Receptor
+    export struct CFDIReceiver {               // cfdi:Receptor
         string taxCode;                 // cfdi:Receptor - RFC
         string name;                    // cfdi:Receptor - Nombre
         string address;                 // cfdi:Receptor - DomicilioFiscalReceptor
@@ -14,5 +13,3 @@ namespace cfdi {
         string usage;                   // cfdi:Receptor - UsoCFDI
     };
 }
-
-#endif 

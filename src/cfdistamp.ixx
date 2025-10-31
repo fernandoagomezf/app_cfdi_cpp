@@ -1,12 +1,11 @@
-#ifndef _CFDISTAMP_HPP_
-#define _CFDISTAMP_HPP_
+export module cfdi.doc:cfdistamp;
 
-#include <string>
+import std;
 
 namespace cfdi {
     using std::string;
 
-    struct CFDIStamp {                  // tfd:TimbreFiscalDigital
+    export struct CFDIStamp {                  // tfd:TimbreFiscalDigital
         string version;                 // tfd:TimbreFiscalDigital - Version
         string uuid;                    // tfd:TimbreFiscalDigital - UUID
         string date;                    // tfd:TimbreFiscalDigital - FechaTimbrado
@@ -16,5 +15,3 @@ namespace cfdi {
         string satSeal;                 // tfd:TimbreFiscalDigital - SelloSAT
     };
 }
-
-#endif 

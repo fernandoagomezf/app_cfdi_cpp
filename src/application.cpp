@@ -1,5 +1,9 @@
-#include "application.hpp"
-#include "window.hpp"
+module cfdi.app:application;
+
+import <wx/wx.h>;
+
+import :window;
+import :application;
 
 using cfdi::Application;
 using cfdi::Window;

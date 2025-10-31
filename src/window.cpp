@@ -1,30 +1,26 @@
-#include "window.hpp"
-#include "document.hpp"
-#include "directoryscanner.hpp"
-#include "output.hpp"
-#include <wx/msgdlg.h>
-#include <wx/dirdlg.h>
-#include <wx/filedlg.h>
-#include <wx/toolbar.h>
-#include <wx/artprov.h>
-#include <fstream>
-#include <sstream>
-#include <filesystem>
-#include <stdexcept>
+module cfdi.app:window;
+
+import <wx/msgdlg.h>;
+import <wx/dirdlg.h>;
+import <wx/filedlg.h>;
+import <wx/toolbar.h>;
+import <wx/artprov.h>;
+
+import std;
+import cfdi.doc;
+import :window;
 
 using std::exception;
 using std::ifstream;
 using std::string;
-using std::vector;
 using std::ofstream;
 using std::ostringstream;
-using cfdi::csv;
-using cfdi::json;
-using cfdi::xml;
+using cfdi::CFDIDocument;
+using cfdi::CFDIScanner;
+using cfdi::CFDISummary;
+using cfdi::CFDIWritter;
+using cfdi::CFDIScanner;
 using cfdi::Window;
-using cfdi::Document;
-using cfdi::DirectoryScanner;
-using cfdi::Summary;
 
 Window::Window()
     : wxFrame(nullptr, wxID_ANY, "Blendwerk Procesador de CFDI v0.1.0"), 
@@ -151,7 +147,7 @@ void Window::onOpen(wxCommandEvent& e) {
     }
     
     try {
-        DirectoryScanner scanner;
+        CFDIScanner scanner;
         string pathStr { selectedPath.ToStdString() };
         auto found = scanner.scan(pathStr);
         
@@ -173,8 +169,8 @@ void Window::onOpen(wxCommandEvent& e) {
                     ss << file.rdbuf();
                     string xml { ss.str() };
                     
-                    Document doc { Document::fromXml(xml) };
-                    Summary summary { doc.summarize() };
+                    CFDIDocument doc { CFDIDocument::fromXml(xml) };
+                    CFDISummary summary { doc.summarize() };
                     _summaries.push_back(summary);
                     ++processed;
                 } else {
@@ -219,34 +215,32 @@ void Window::onSave(wxCommandEvent& e) {
                         wxString::FromUTF8("Error"), wxOK | wxICON_ERROR);
             return;
         }
+
+        CFDIWritter writter;
         
         file << "\xEF\xBB\xBF"; // necesario para que excel abra el archivo con UTF-8
         switch (filterIndex) {
             case 0: // CSV
+                file << "Fecha,Descripción,RFC Emisor,No. Factura,SubTotal,IVA,Total\n";
                 for (const auto& summary : _summaries) {
-                    file << csv << "Fecha,Descripción,RFC Emisor,No. Factura,SubTotal,IVA,Total\n";
-                    file << csv << summary << "\n";
+                    file << writter.writeCsv(summary) << "\n";
                 }
                 break;
                 
             case 1: // JSON
-                file << json << "[\n";
-                for (size_t i = 0; i < _summaries.size(); ++i) {
-                    file << json << "  " << _summaries[i];
-                    if (i < _summaries.size() - 1) {
-                        file << json << ",";
-                    }
-                    file << json << "\n";
+                file << "[\n";
+                for (const auto& summary : _summaries) {
+                    file << writter.writeJson(summary) << ", \n";
                 }
-                file << json << "]\n";
+                file << "]\n";
                 break;
                 
             case 2: // XML
-                file << xml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Summaries>\n";
+                file << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Summaries>\n";
                 for (const auto& summary : _summaries) {
-                    file << xml << summary << "\n";
+                    file << writter.writeXml(summary) << "\n";
                 }
-                file << xml << "</Summaries>\n";
+                file << "</Summaries>\n";
                 break;
         }
         

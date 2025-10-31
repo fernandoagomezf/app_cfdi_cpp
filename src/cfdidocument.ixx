@@ -1,16 +1,13 @@
-#ifndef _CFDI_HPP_
-#define _CFDI_HPP_
+export module cfdi.doc:cfdidocument;
 
-#include <list>
-#include <string>
-#include <iostream>
-#include "cfdiheader.hpp"
-#include "cfdiissuer.hpp"
-#include "cfdireceiver.hpp"
-#include "cfdiconcept.hpp"
-#include "cfditax.hpp"
-#include "cfdicomplement.hpp"
-#include "summary.hpp"
+import std;
+import :cfdicomplement;
+import :cfdiconcept;
+import :cfdiheader;
+import :cfdiissuer;
+import :cfdireceiver;
+import :cfditax;
+import :cfdisummary;
 
 namespace cfdi {
     using std::istream;
@@ -19,12 +16,13 @@ namespace cfdi {
     using std::string_view;
     using cfdi::CFDIComplement;
     using cfdi::CFDIConcept;
+    using cfdi::CFDIHeader;
     using cfdi::CFDIIssuer;
     using cfdi::CFDIReceiver;
     using cfdi::CFDITax;
-    using cfdi::Summary;
+    using cfdi::CFDISummary;
 
-    class Document {
+    export class CFDIDocument {
         public:
             const CFDIHeader& header() const;
             const CFDIIssuer& issuer() const;
@@ -33,9 +31,10 @@ namespace cfdi {
             const CFDITax& taxes() const;
             const CFDIComplement& complement() const;
 
-            Summary summarize() const;
+            CFDISummary summarize() const;
 
-            static Document fromXml(string_view xml);
+            static CFDIDocument fromXml(string_view xml);
+            string toCsv() const;
         
         private:
             CFDIHeader _header;             // cfdi:Comprobante
@@ -46,5 +45,3 @@ namespace cfdi {
             CFDIComplement _complement;     // cfdi:Complemento
     };
 }
-
-#endif

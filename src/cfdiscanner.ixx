@@ -1,9 +1,6 @@
-#ifndef _SCANNER_HPP_
-#define _SCANNER_HPP_
+export module cfdi.doc:cfdiscanner;
 
-#include <list>
-#include <string>
-#include <filesystem>
+import std;
 
 namespace cfdi {
     using std::filesystem::path;
@@ -11,7 +8,7 @@ namespace cfdi {
     using std::string;
     using std::string_view;
 
-    class DirectoryScanner {
+    export class CFDIScanner {
         using container_t = list<path>;
         using size_type = container_t::size_type;
         using const_iterator = container_t::const_iterator;
@@ -29,5 +26,3 @@ namespace cfdi {
             container_t _files;
     };
 }
-
-#endif 

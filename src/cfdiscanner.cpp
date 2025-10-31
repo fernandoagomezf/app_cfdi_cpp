@@ -1,8 +1,8 @@
-#include "directoryscanner.hpp"
-#include <fstream>
-#include <filesystem>
-#include <format>
-#include <stdexcept>
+module cfdi.doc:cfdiscanner;
+
+import std;
+import :cfdiscanner;
+
 
 using std::filesystem::current_path;
 using std::filesystem::path;
@@ -13,21 +13,21 @@ using std::ifstream;
 using std::runtime_error;
 using std::string;
 using std::string_view;
-using cfdi::DirectoryScanner;
+using cfdi::CFDIScanner;
 
-string_view DirectoryScanner::directory() const {
+string_view CFDIScanner::directory() const {
     return _directory;
 }
 
-DirectoryScanner::const_iterator DirectoryScanner::begin() const {
+CFDIScanner::const_iterator CFDIScanner::begin() const {
     return _files.begin();
 }
 
-DirectoryScanner::const_iterator DirectoryScanner::end() const {
+CFDIScanner::const_iterator CFDIScanner::end() const {
     return _files.end();
 }
 
-DirectoryScanner::size_type DirectoryScanner::scan(string_view directory) {    
+CFDIScanner::size_type CFDIScanner::scan(string_view directory) {    
     try {
         _directory = directory;
         _files.clear();
@@ -48,7 +48,7 @@ DirectoryScanner::size_type DirectoryScanner::scan(string_view directory) {
     return _files.size();
 }
 
-DirectoryScanner::size_type DirectoryScanner::scan() {    
+CFDIScanner::size_type CFDIScanner::scan() {    
     auto current { current_path().string() };
     return scan(current);
 }

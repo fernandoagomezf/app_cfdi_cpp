@@ -1,16 +1,13 @@
-#ifndef _SUMMARY_HPP_
-#define _SUMMARY_HPP_
+export module cfdi.doc:cfdisummary;
 
-#include <string>
-#include <ostream>
-#include <ios>
+import std;
 
 namespace cfdi {
     using std::string;
     using std::ostream;
     using std::ios_base;
 
-    struct Summary {
+    export struct CFDISummary {
         string date;
         string description;
         string issuerTaxCode;
@@ -19,8 +16,4 @@ namespace cfdi {
         string taxes;
         string total;
     };
-
-    ostream& operator<<(ostream& stream, const Summary& summary);
 }
-
-#endif 

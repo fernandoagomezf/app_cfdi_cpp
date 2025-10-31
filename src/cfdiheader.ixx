@@ -1,14 +1,12 @@
-#ifndef _CFDIRECEIPT_HPP_
-#define _CFDIRECEIPT_HPP_
+export module cfdi.doc:cfdiheader;
 
-#include <string>
-#include <list>
+import std;
 
 namespace cfdi {
     using std::string;
     using std::list;
 
-    struct CFDIHeader {                 // cfdi:Comprobante
+    export struct CFDIHeader {                 // cfdi:Comprobante
         string version;                 // cfdi:Comprobante - Version
         string series;                  // cfdi:Comprobante - Serie
         string folium;                  // cfdi:Comprobante - Folio
@@ -27,5 +25,3 @@ namespace cfdi {
         string exporting;               // cfdi:Comprobante - Exportacion
     };
 }
-
-#endif 

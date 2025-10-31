@@ -1,16 +1,14 @@
-#ifndef _CFDICONCEPT_HPP_
-#define _CFDICONCEPT_HPP_
+export module cfdi.doc:cfdiconcept;
 
-#include <list>
-#include <string>
-#include "cfditax.hpp"
+import std;
+import :cfditax;
 
 namespace cfdi {
     using std::list;
     using std::string;
     using cfdi::CFDITax;
 
-    struct CFDIConcept {                // cfdi:Concepto
+    export struct CFDIConcept {         // cfdi:Concepto
         string code;                    // cfdi:Concepto - ClaveProdServ
         string idNumber;                // cfdi:Concepto - NoIdentificacion
         string quantity;                // cfdi:Concepto - Cantidad
@@ -23,5 +21,3 @@ namespace cfdi {
         list<CFDITax> taxes;            // cfdi:Concepto / cfdi:Impuestos
     };
 }
-
-#endif 
