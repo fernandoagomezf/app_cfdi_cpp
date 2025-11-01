@@ -1,4 +1,4 @@
-# Blendwerk CFDI Processor
+# CFDI Processor
 
 ![C++23](https://img.shields.io/badge/C%2B%2B-23-blue.svg?style=flat&logo=c%2B%2B)
 ![wxWidgets](https://img.shields.io/badge/wxWidgets-3.2-blue.svg)
