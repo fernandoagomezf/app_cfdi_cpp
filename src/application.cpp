@@ -4,7 +4,6 @@ module;
 
 module cfdi.app:application;
 
-
 import :window;
 import :application;
 

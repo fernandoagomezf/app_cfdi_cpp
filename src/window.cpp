@@ -87,20 +87,20 @@ void Window::initGrid() {
     _grid->CreateGrid(0, 7); 
     
     _grid->SetColLabelValue(0, wxString::FromUTF8("Fecha"));
-    _grid->SetColLabelValue(1, wxString::FromUTF8("Descripción"));
-    _grid->SetColLabelValue(2, wxString::FromUTF8("RFC Emisor"));
-    _grid->SetColLabelValue(3, wxString::FromUTF8("No. Factura"));
-    _grid->SetColLabelValue(4, wxString::FromUTF8("SubTotal"));
-    _grid->SetColLabelValue(5, wxString::FromUTF8("IVA"));
-    _grid->SetColLabelValue(6, wxString::FromUTF8("Total"));
+    _grid->SetColLabelValue(1, wxString::FromUTF8("RFC Emisor"));
+    _grid->SetColLabelValue(2, wxString::FromUTF8("No. Factura"));
+    _grid->SetColLabelValue(3, wxString::FromUTF8("SubTotal"));
+    _grid->SetColLabelValue(4, wxString::FromUTF8("IVA"));
+    _grid->SetColLabelValue(5, wxString::FromUTF8("Total"));
+    _grid->SetColLabelValue(6, wxString::FromUTF8("Descripción"));
     
     _grid->SetColSize(0, 120);
-    _grid->SetColSize(1, 250);
-    _grid->SetColSize(2, 120);
-    _grid->SetColSize(3, 250);
+    _grid->SetColSize(1, 120);
+    _grid->SetColSize(2, 250);
+    _grid->SetColSize(3, 100);
     _grid->SetColSize(4, 100);
     _grid->SetColSize(5, 100);
-    _grid->SetColSize(6, 100);
+    _grid->SetColSize(6, 300);
     _grid->EnableEditing(false);
     
     wxBoxSizer* sizer = new wxBoxSizer { wxVERTICAL };
@@ -118,12 +118,12 @@ void Window::populateGrid() {
         int row { _grid->GetNumberRows() - 1 };
         
         _grid->SetCellValue(row, 0, wxString::FromUTF8(summary.date));
-        _grid->SetCellValue(row, 1, wxString::FromUTF8(summary.description));
-        _grid->SetCellValue(row, 2, wxString::FromUTF8(summary.issuerTaxCode));
-        _grid->SetCellValue(row, 3, wxString::FromUTF8(summary.invoiceId));
-        _grid->SetCellValue(row, 4, wxString::FromUTF8(summary.subTotal));
-        _grid->SetCellValue(row, 5, wxString::FromUTF8(summary.taxes));
-        _grid->SetCellValue(row, 6, wxString::FromUTF8(summary.total));
+        _grid->SetCellValue(row, 1, wxString::FromUTF8(summary.issuerTaxCode));
+        _grid->SetCellValue(row, 2, wxString::FromUTF8(summary.invoiceId));
+        _grid->SetCellValue(row, 3, wxString::FromUTF8(summary.subTotal));
+        _grid->SetCellValue(row, 4, wxString::FromUTF8(summary.taxes));
+        _grid->SetCellValue(row, 5, wxString::FromUTF8(summary.total));
+        _grid->SetCellValue(row, 6, wxString::FromUTF8(summary.description));
     }
 }
 
