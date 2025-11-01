@@ -165,7 +165,7 @@ app_cfdi_cpp/
    - Select destination file
    - Data will be exported in the selected format
 
-## 🔬 Key Features Implementation
+## Key Features Implementation
 
 ### C++ Modules
 The entire project is built using C++20 modules with module partitions for better compilation times and encapsulation:
