@@ -38,6 +38,4 @@ namespace cfdi {
 
         return result;
     }
-
-    void about(ostream& out);
 }
