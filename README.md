@@ -55,7 +55,7 @@ GUI application:
 - `Application` - wxWidgets application entry point
 - `Window` - Main application window with grid view
 
-## 🔧 Technology Stack
+## Technology Stack
 
 - **Language**: C++23 
 - **Build System**: CMake 4.1+
@@ -65,7 +65,7 @@ GUI application:
 - **Supported Compilers**:
   - MSVC 2022 (17.10+)  
 
-## 📋 Prerequisites
+## Prerequisites
 
 ### Required Tools
 - CMake 4.1 or later
@@ -78,7 +78,7 @@ Set the `VCPKG_ROOT` environment variable to your vcpkg installation directory:
 $env:VCPKG_ROOT = "C:\path\to\vcpkg"
 ```
 
-## 🚀 Building the Project
+## Building the Project
 
 ### 1. Install Dependencies
 ```powershell
@@ -108,7 +108,7 @@ cmake --build build/msvc --config Release
 .\build\msvc\Debug\CFDI.exe
 ```
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 app_cfdi_cpp/
@@ -145,7 +145,7 @@ app_cfdi_cpp/
 └── vcpkg.json              # vcpkg manifest
 ```
 
-## 🎯 Usage
+## Usage
 
 1. **Launch the application**
    - Run `CFDI.exe` from the build directory
