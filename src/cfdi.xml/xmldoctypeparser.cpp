@@ -17,13 +17,12 @@ using cfdi::XmlNodeType;
 XmlDocTypeParser::XmlDocTypeParser(XmlBuffer& buffer)
     : XmlFragmentParser(buffer) 
 {
-
 }
 
-XmlNode XmlDocTypeParser::parse() {
+XmlNode XmlDocTypeParser::parse() {     // parse the section <!DOCTYPE ... >
     auto& buffer { getBuffer() };
 
-    // Expect "<!DOCTYPE"
+    // make sure we're dealing with a doctype
     string doctype = "DOCTYPE";
     for (char c : doctype) {
         if (!buffer.canRead() || buffer.read() != c) {
@@ -52,7 +51,7 @@ XmlNode XmlDocTypeParser::parse() {
     }
 
     if (!foundEnd) {
-        throw runtime_error("Unclosed DOCTYPE");
+        throw runtime_error("Invalid DOCTYPE syntax");
     }
 
     XmlNode node { 

@@ -5,7 +5,7 @@ import std;
 namespace cfdi {
     using std::string;
     
-    export struct CFDIReceiver {               // cfdi:Receptor
+    export struct CFDIReceiver {        // cfdi:Receptor
         string taxCode;                 // cfdi:Receptor - RFC
         string name;                    // cfdi:Receptor - Nombre
         string address;                 // cfdi:Receptor - DomicilioFiscalReceptor

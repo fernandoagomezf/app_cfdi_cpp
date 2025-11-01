@@ -164,10 +164,3 @@ CFDIDocument CFDIDocument::fromXml(string_view xml) {
     return doc;
 }
 
-string CFDIDocument::toCsv() const {
-    CFDIWritter writter { };
-    CFDISummary summary { summarize() };
-    auto csv { writter.writeCsv(summary) };
-    return csv;
-}
-

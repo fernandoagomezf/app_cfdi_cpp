@@ -34,8 +34,7 @@ namespace cfdi {
             CFDISummary summarize() const;
 
             static CFDIDocument fromXml(string_view xml);
-            string toCsv() const;
-        
+            
         private:
             CFDIHeader _header;             // cfdi:Comprobante
             CFDIIssuer _issuer;             // cfdi:Emisor

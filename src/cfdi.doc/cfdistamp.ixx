@@ -5,7 +5,7 @@ import std;
 namespace cfdi {
     using std::string;
 
-    export struct CFDIStamp {                  // tfd:TimbreFiscalDigital
+    export struct CFDIStamp {           // tfd:TimbreFiscalDigital
         string version;                 // tfd:TimbreFiscalDigital - Version
         string uuid;                    // tfd:TimbreFiscalDigital - UUID
         string date;                    // tfd:TimbreFiscalDigital - FechaTimbrado

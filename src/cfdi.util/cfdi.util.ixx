@@ -12,8 +12,7 @@ namespace cfdi {
     using std::string;
 
     export template <input_range Range, typename T>
-    string join(const Range& range, const string& delimiter, T&& transform)
-    {
+    string join(const Range& range, const string& delimiter, T&& transform) {
         string result { };
 
         auto it = begin(range);

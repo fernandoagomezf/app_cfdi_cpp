@@ -20,13 +20,13 @@ XmlElementParser::XmlElementParser(XmlBuffer& buffer)
 
 }
 
-XmlNode XmlElementParser::parse() {
+XmlNode XmlElementParser::parse() {     // parse XML elements: <Element attribute='value' ...> ... </Element>
     auto& buffer { getBuffer() };
 
-    if (buffer.peek() == '/') {
+    if (buffer.peek() == '/') {         // check whether we're dealing with the start tag, e.g. <Element>
         buffer.consume();
         return parseElementEnd();
-    } else {
+    } else {                            // otherwise we're dealing with the closing tag, e.g. </Element>
         return parseElementStart();
     }
 }
@@ -40,22 +40,19 @@ XmlNode XmlElementParser::parseElementStart(){
         throw runtime_error("Invalid element name");
     }
 
-    // Parse attributes
-    auto attributes = parseAttributes();
+    auto attributes = parseAttributes();    // parse to find the element's attributes
     buffer.skipWhiteSpace();
 
-    // Check for empty element
-    if (buffer.canRead() && buffer.peek() == '/') {
-        buffer.read(); // consume '/'
+    if (buffer.canRead() && buffer.peek() == '/') {     // check for a special case of empty tags, e.g. <Element />
+        buffer.consume(); // consume '/'
         isEmpty = true;
     }
 
-    // Expect closing '>'
-    if (!buffer.canRead() || buffer.read() != '>') {
-        throw runtime_error("Expected '>' to close element tag");
+    if (!buffer.canRead() || buffer.read() != '>') {    // check the tag is well formed
+        throw runtime_error("Invalid element tag syntax");
     }
 
-    auto [prefix, localName] = splitQualifiedName(name);
+    auto [prefix, localName] = splitQualifiedName(name);    // elements can have a qualified name with a namespace, e.g. <cfdi:Tax>
     
     XmlNode node { 
         .nodeType = XmlNodeType::Element,
@@ -74,17 +71,16 @@ XmlNode XmlElementParser::parseElementEnd(){
     string name { parseName() };
         
     if (name.empty()) {
-        throw runtime_error("Invalid end element name");
+        throw runtime_error("Invalid end element tag syntax");
     }
 
     buffer.skipWhiteSpace();
 
-    // Expect closing '>'
-    if (!buffer.canRead() || buffer.read() != '>') {
-        throw runtime_error("Expected '>' to close end element tag");
+    if (!buffer.canRead() || buffer.read() != '>') {    // check the tag is well formed
+        throw runtime_error("Invalid end element tag syntax");
     }
 
-    auto [prefix, localName] = splitQualifiedName(name);
+    auto [prefix, localName] = splitQualifiedName(name); // elements can have a qualified name with a namespace, e.g. <cfdi:Tax>
 
     XmlNode node { 
         .nodeType = XmlNodeType::EndElement,

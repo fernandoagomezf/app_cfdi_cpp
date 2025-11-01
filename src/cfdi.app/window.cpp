@@ -224,14 +224,14 @@ void Window::onSave(wxCommandEvent& e) {
         
         file << "\xEF\xBB\xBF"; // necesario para que excel abra el archivo con UTF-8
         switch (filterIndex) {
-            case 0: // CSV
+            case 0: // csv
                 file << "Fecha,Descripción,RFC Emisor,No. Factura,SubTotal,IVA,Total\n";
                 for (const auto& summary : _summaries) {
                     file << writter.writeCsv(summary) << "\n";
                 }
                 break;
                 
-            case 1: // JSON
+            case 1: // json
                 file << "[\n";
                 for (const auto& summary : _summaries) {
                     file << writter.writeJson(summary) << ", \n";
@@ -239,7 +239,7 @@ void Window::onSave(wxCommandEvent& e) {
                 file << "]\n";
                 break;
                 
-            case 2: // XML
+            case 2: // xml
                 file << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Summaries>\n";
                 for (const auto& summary : _summaries) {
                     file << writter.writeXml(summary) << "\n";

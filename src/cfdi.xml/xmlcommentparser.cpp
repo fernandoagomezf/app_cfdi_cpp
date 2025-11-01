@@ -20,10 +20,10 @@ XmlCommentParser::XmlCommentParser(XmlBuffer& buffer)
     
 }
 
-XmlNode XmlCommentParser::parse() {
+XmlNode XmlCommentParser::parse() {     // parse the section "<!-- ... -->"
     auto& buffer { getBuffer() };
 
-    // Expect "<!--"
+    // make sure we're dealing with a comment
     if (buffer.read() != '-' || !buffer.canRead() || buffer.read() != '-') {
         throw runtime_error("Invalid comment syntax");
     }
@@ -34,10 +34,10 @@ XmlNode XmlCommentParser::parse() {
     while (buffer.canRead()) {
         auto c = buffer.read();        
         if (c == '-' && buffer.canRead() && buffer.peek() == '-') {
-            buffer.read(); // consume second '-'
+            buffer.consume(); // consume second '-'
             
             if (buffer.canRead() && buffer.peek() == '>') {
-                buffer.read(); // consume '>'
+                buffer.consume(); // consume '>'
                 foundEnd = true;
                 break;
             } else {

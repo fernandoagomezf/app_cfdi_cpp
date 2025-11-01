@@ -17,10 +17,9 @@ using cfdi::XmlNodeType;
 XmlDeclarationParser::XmlDeclarationParser(XmlBuffer& buffer)
     : XmlFragmentParser(buffer) 
 {
-
 }
 
-XmlNode XmlDeclarationParser::parse() {
+XmlNode XmlDeclarationParser::parse() {     // parse the section <?xml ... ?>
     auto& buffer { getBuffer() };
 
     // We're already past "<?xml"    
@@ -30,7 +29,7 @@ XmlNode XmlDeclarationParser::parse() {
     auto attributes { parseAttributes() };
     buffer.skipWhiteSpace();
 
-    // Expect "?>"
+    // make sure we're inside a xml declaration by checking its ending
     if (!buffer.canRead() || buffer.read() != '?' || !buffer.canRead() || buffer.read() != '>') {
         throw runtime_error("Invalid XML declaration syntax");
     }

@@ -6,7 +6,7 @@ namespace cfdi {
     using std::string;
     using std::list;
 
-    export struct CFDIHeader {                 // cfdi:Comprobante
+    export struct CFDIHeader {          // cfdi:Comprobante
         string version;                 // cfdi:Comprobante - Version
         string series;                  // cfdi:Comprobante - Serie
         string folium;                  // cfdi:Comprobante - Folio

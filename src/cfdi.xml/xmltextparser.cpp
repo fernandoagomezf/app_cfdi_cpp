@@ -19,23 +19,21 @@ XmlTextParser::XmlTextParser(XmlBuffer& buffer)
 
 }
 
-XmlNode XmlTextParser::parse() {
+XmlNode XmlTextParser::parse() {    // check for normal text inside element tags, e.g. <Element> all these text characers </Element>
     auto& buffer { getBuffer() };
     string text { };    
     while (buffer.canRead() && buffer.peek() != '<') {
         auto c = buffer.read();
         
-        // Handle entity references
-        if (c == '&') {
+        if (c == '&') { // text can have entities, e.g. &amp; &lt; &quot; etc. so decode them
             string entity { };
             while (buffer.canRead() && buffer.peek() != ';') {
                 entity += buffer.read();
             }
             if (buffer.canRead()) {
-                buffer.read(); // consume ';'
+                buffer.consume(); // consume ';'
             }
             
-            // Decode common entities
             if (entity == "lt") {
                 text += '<';
             } else if (entity == "gt") {
@@ -47,13 +45,11 @@ XmlNode XmlTextParser::parse() {
             } else if (entity == "apos") {
                 text += '\'';
             } else if (!entity.empty() && entity[0] == '#') {
-                // Numeric character reference
+                // if it's not named, we have a numeric (e.g. unicode) entity
                 int code { 0 };
-                if (entity.length() > 1 && entity[1] == 'x') {
-                    // Hexadecimal
+                if (entity.length() > 1 && entity[1] == 'x') {  // base-16 entity, deal with hex format
                     code = stoi(entity.substr(2), nullptr, 16);
-                } else {
-                    // Decimal
+                } else { 
                     code = stoi(entity.substr(1));
                 }
                 text += static_cast<char>(code);
@@ -65,7 +61,7 @@ XmlNode XmlTextParser::parse() {
         }
     }
 
-    // Check if it's all whitespace
+    // check whether we found actual text or only whitespace, if so return Whitespace node type instead of text
     bool allWhitespace = true;
     for (char c : text) {
         if (!XmlBuffer::isWhiteSpace(c)) {

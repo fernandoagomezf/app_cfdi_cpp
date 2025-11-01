@@ -3,7 +3,6 @@ module cfdi.doc:cfdiscanner;
 import std;
 import :cfdiscanner;
 
-
 using std::filesystem::current_path;
 using std::filesystem::path;
 using std::filesystem::filesystem_error;

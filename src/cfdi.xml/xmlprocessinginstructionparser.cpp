@@ -20,7 +20,7 @@ XmlProcessingInstructionParser::XmlProcessingInstructionParser(XmlBuffer& buffer
 
 }
 
-XmlNode XmlProcessingInstructionParser::parse() {
+XmlNode XmlProcessingInstructionParser::parse() {   // check for the section <?...?> (different from <?xml ?>)
     auto& buffer { getBuffer() };
     string target = { parseName() };
     
@@ -36,7 +36,7 @@ XmlNode XmlProcessingInstructionParser::parse() {
     while (buffer.canRead()) {
         auto c = buffer.read();        
         if (c == '?' && buffer.canRead() && buffer.peek() == '>') {
-            buffer.read(); // consume '>'
+            buffer.consume(); // consume '>'
             foundEnd = true;
             break;
         } else {

@@ -34,20 +34,16 @@ string XmlFragmentParser::parseName() {
 
     auto c = _buffer.peek();
     
-    // XML name must start with letter, underscore, or colon
-    if (!isalpha(static_cast<unsigned char>(c)) && c != '_' && c != ':') {
+    if (!isalpha(static_cast<unsigned char>(c)) && c != '_' && c != ':') { // a valid name must start with letter, underscore, or colon
         return name;
     }
 
     while (_buffer.canRead()) {
-        c = _buffer.peek();
-        
-        // Valid name characters
-        if (isalnum(static_cast<unsigned char>(c)) || 
-            c == '_' || c == ':' || c == '-' || c == '.') {
+        c = _buffer.peek();        
+        if (isalnum(static_cast<unsigned char>(c)) || c == '_' || c == ':' || c == '-' || c == '.') {
             name += _buffer.read();
         } else {
-            break;
+            break;  // found an invalid character for a name, stop right here
         }
     }
 
@@ -55,35 +51,29 @@ string XmlFragmentParser::parseName() {
 }
 
 map<string, string> XmlFragmentParser::parseAttributes() {
-    map<string, string>attributes { };
+    map<string, string> attributes { };
 
     while (_buffer.canRead()) {
         _buffer.skipWhiteSpace();
 
         auto c = _buffer.peek();
         
-        // Check for end of tag
-        if (c == '>' || c == '/' || c == '?') {
+        if (c == '>' || c == '/' || c == '?') { // if one of these characters is found, we reached the end of attributes for this element
             break;
         }
 
-        // Read attribute name
         string attrName { parseName() };        
         if (attrName.empty()) {
             break;
         }
-
         _buffer.skipWhiteSpace();
 
-        // Expect '='
-        if (!_buffer.canRead() || _buffer.read() != '=') {
-            throw runtime_error("Expected '=' after attribute name");
+        if (!_buffer.canRead() || _buffer.read() != '=') {  // attriutes follow the pattern attribute='value' so find the = character
+            throw runtime_error("Invalid attribute syntax");
         }
-
         _buffer.skipWhiteSpace();
 
-        // Read attribute value
-        string attrValue { parseAttributeValue() };
+        string attrValue { parseAttributeValue() }; // we have the name, now extract the value
         attributes[attrName] = attrValue;
     }
 
@@ -96,8 +86,8 @@ string XmlFragmentParser::parseAttributeValue() {
     }
 
     auto quote = _buffer.read();    
-    if (quote != '"' && quote != '\'') {
-        throw runtime_error("Attribute value must be quoted");
+    if (quote != '"' && quote != '\'') {    // attributes follow the pattern name='value' or name="value", so check for both chars
+        throw runtime_error("Invalid attribute syntax");
     }
 
     string value { };
@@ -106,16 +96,16 @@ string XmlFragmentParser::parseAttributeValue() {
         if (c == quote) {
             break;
         } else if (c == '&') {
-            // Handle entity references
+            // deal with entities, they follow the pattern &...; as in &amp; &quot; etc.
             string entity { };
             while (_buffer.canRead() && _buffer.peek() != ';') {
                 entity += _buffer.read();
             }
             if (_buffer.canRead()) {
-                _buffer.read(); // consume ';'
+                _buffer.consume(); // consume ';'
             }
             
-            // Decode common entities
+            // handle common known entities
             if (entity == "lt") {
                 value += '<';
             } else if (entity == "gt") {
@@ -127,13 +117,11 @@ string XmlFragmentParser::parseAttributeValue() {
             } else if (entity == "apos") {
                 value += '\'';
             } else if (!entity.empty() && entity[0] == '#') {
-                // Numeric character reference
+                // otherwise it's a numerical entity (e.g. a unicode entity)
                 int code { 0 };
-                if (entity.length() > 1 && entity[1] == 'x') {
-                    // Hexadecimal
+                if (entity.length() > 1 && entity[1] == 'x') {  // base-16 number so skip the hex format
                     code = stoi(entity.substr(2), nullptr, 16);
-                } else {
-                    // Decimal
+                } else { 
                     code = stoi(entity.substr(1));
                 }
                 value += static_cast<char>(code);

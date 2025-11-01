@@ -17,14 +17,14 @@ using cfdi::XmlNodeType;
 XmlCDataParser::XmlCDataParser(XmlBuffer& buffer)
     : XmlFragmentParser(buffer) 
 {
-
 }
 
-XmlNode XmlCDataParser::parse() {
+
+XmlNode XmlCDataParser::parse() {       // parse the section "<![CDATA[ ... ]]>"
     auto& buffer { getBuffer() };
 
-    // Expect "<![CDATA["
-    string expected = { "[CDATA[" };
+
+    string expected = { "[CDATA[" };    // make sure we're dealing with a CDATA section
     for (auto expectedChar : expected) {
         if (!buffer.canRead() || buffer.read() != expectedChar) {
             throw runtime_error("Invalid CDATA syntax");
@@ -37,10 +37,10 @@ XmlNode XmlCDataParser::parse() {
     while (buffer.canRead()) {
         auto c = buffer.read();        
         if (c == ']' && buffer.canRead() && buffer.peek() == ']') {
-            buffer.read(); // consume second ']'
+            buffer.consume(); // consume second ']'
             
             if (buffer.canRead() && buffer.peek() == '>') {
-                buffer.read(); // consume '>'
+                buffer.consume(); // consume '>'
                 foundEnd = true;
                 break;
             } else {
@@ -52,7 +52,7 @@ XmlNode XmlCDataParser::parse() {
     }
 
     if (!foundEnd) {
-        throw runtime_error("Unclosed CDATA section");
+        throw runtime_error("Invalid CDATA syntax");
     }
 
     XmlNode node { 
