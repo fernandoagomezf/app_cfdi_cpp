@@ -11,8 +11,7 @@ namespace cfdi {
     using std::ranges::input_range;
     using std::string;
 
-    export
-    template <input_range Range, typename T>
+    export template <input_range Range, typename T>
     string join(const Range& range, const string& delimiter, T&& transform)
     {
         string result { };
