@@ -12,6 +12,8 @@ namespace cfdi {
         string description;
         string issuerTaxCode;
         string invoiceId;
+        string paymentMethod;
+        string placeOfIssue;
         string subTotal;
         string taxes;
         string total;

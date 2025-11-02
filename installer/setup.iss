@@ -1,6 +1,6 @@
 [Setup]
 AppName=Blendwerk Procesador de CFDI
-AppVersion=0.1.0
+AppVersion=0.1.1
 AppPublisher=Blendwerk
 AppPublisherURL=https://github.com/fernandoagomezf/app_cfdi_cpp
 DefaultDirName={autopf}\Blendwerk CFDI
@@ -9,7 +9,7 @@ UninstallDisplayIcon={app}\CFDI.exe
 Compression=lzma2
 SolidCompression=yes
 OutputDir=..\build
-OutputBaseFilename=BlendwerkCFDI-v0.1.0
+OutputBaseFilename=BlendwerkCFDI-v0.1.1
 WizardStyle=modern
 PrivilegesRequired=admin
 ArchitecturesAllowed=x64compatible

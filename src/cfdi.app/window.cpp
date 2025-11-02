@@ -27,7 +27,7 @@ using cfdi::CFDIScanner;
 using cfdi::Window;
 
 Window::Window()
-    : wxFrame(nullptr, wxID_ANY, "Blendwerk Procesador de CFDI v0.1.0"), 
+    : wxFrame(nullptr, wxID_ANY, "Blendwerk Procesador de CFDI v0.1.1"), 
       _grid { nullptr }
 {
     initMenu();
@@ -84,15 +84,17 @@ void Window::initToolBar() {
 
 void Window::initGrid() {
     _grid = new wxGrid { this, wxID_ANY };    
-    _grid->CreateGrid(0, 7); 
+    _grid->CreateGrid(0, 9); 
     
     _grid->SetColLabelValue(0, wxString::FromUTF8("Fecha"));
     _grid->SetColLabelValue(1, wxString::FromUTF8("RFC Emisor"));
-    _grid->SetColLabelValue(2, wxString::FromUTF8("No. Factura"));
-    _grid->SetColLabelValue(3, wxString::FromUTF8("SubTotal"));
-    _grid->SetColLabelValue(4, wxString::FromUTF8("IVA"));
-    _grid->SetColLabelValue(5, wxString::FromUTF8("Total"));
-    _grid->SetColLabelValue(6, wxString::FromUTF8("Descripción"));
+    _grid->SetColLabelValue(2, wxString::FromUTF8("Factura"));
+    _grid->SetColLabelValue(3, wxString::FromUTF8("Pago"));
+    _grid->SetColLabelValue(4, wxString::FromUTF8("Expedición"));
+    _grid->SetColLabelValue(5, wxString::FromUTF8("SubTotal"));
+    _grid->SetColLabelValue(6, wxString::FromUTF8("IVA"));
+    _grid->SetColLabelValue(7, wxString::FromUTF8("Total"));
+    _grid->SetColLabelValue(8, wxString::FromUTF8("Descripción"));
     
     _grid->SetColSize(0, 120);
     _grid->SetColSize(1, 120);
@@ -100,7 +102,9 @@ void Window::initGrid() {
     _grid->SetColSize(3, 100);
     _grid->SetColSize(4, 100);
     _grid->SetColSize(5, 100);
-    _grid->SetColSize(6, 300);
+    _grid->SetColSize(6, 100);
+    _grid->SetColSize(7, 100);
+    _grid->SetColSize(8, 200);
     _grid->EnableEditing(false);
     
     wxBoxSizer* sizer = new wxBoxSizer { wxVERTICAL };
@@ -120,10 +124,13 @@ void Window::populateGrid() {
         _grid->SetCellValue(row, 0, wxString::FromUTF8(summary.date));
         _grid->SetCellValue(row, 1, wxString::FromUTF8(summary.issuerTaxCode));
         _grid->SetCellValue(row, 2, wxString::FromUTF8(summary.invoiceId));
-        _grid->SetCellValue(row, 3, wxString::FromUTF8(summary.subTotal));
-        _grid->SetCellValue(row, 4, wxString::FromUTF8(summary.taxes));
-        _grid->SetCellValue(row, 5, wxString::FromUTF8(summary.total));
-        _grid->SetCellValue(row, 6, wxString::FromUTF8(summary.description));
+        _grid->SetCellValue(row, 3, wxString::FromUTF8(summary.paymentMethod));
+        _grid->SetCellValue(row, 4, wxString::FromUTF8(summary.placeOfIssue));
+
+        _grid->SetCellValue(row, 5, wxString::FromUTF8(summary.subTotal));
+        _grid->SetCellValue(row, 6, wxString::FromUTF8(summary.taxes));
+        _grid->SetCellValue(row, 7, wxString::FromUTF8(summary.total));
+        _grid->SetCellValue(row, 8, wxString::FromUTF8(summary.description));
     }
 }
 
@@ -132,7 +139,7 @@ void Window::onExit(wxCommandEvent& e) {
 }
 
 void Window::onAbout(wxCommandEvent& e) {
-    wxMessageBox(wxString::FromUTF8("Blendwerk Procesador de CFDI v0.1.0\n\nAplicación para procesar archivos CFDI y exportar resúmenes."), 
+    wxMessageBox(wxString::FromUTF8("Blendwerk Procesador de CFDI v0.1.1\n\nAplicación para procesar archivos CFDI y exportar resúmenes."), 
                  wxString::FromUTF8("Acerca de"), wxOK | wxICON_INFORMATION);
 }
 
@@ -225,7 +232,7 @@ void Window::onSave(wxCommandEvent& e) {
         file << "\xEF\xBB\xBF"; // necesario para que excel abra el archivo con UTF-8
         switch (filterIndex) {
             case 0: // csv
-                file << "Fecha,Descripción,RFC Emisor,No. Factura,SubTotal,IVA,Total\n";
+                file << "Fecha,Descripción,RFC Emisor,Factura,Pago,Expedición,SubTotal,IVA,Total\n";
                 for (const auto& summary : _summaries) {
                     file << writter.writeCsv(summary) << "\n";
                 }

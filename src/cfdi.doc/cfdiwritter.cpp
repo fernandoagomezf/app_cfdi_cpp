@@ -19,6 +19,8 @@ string CFDIWritter::writeCsv(const CFDISummary& summary) {
            << escapeCsv(summary.description) << ","
            << escapeCsv(summary.issuerTaxCode) << ","
            << escapeCsv(summary.invoiceId) << ","
+           << escapeCsv(summary.paymentMethod) << ","
+           << escapeCsv(summary.placeOfIssue) << ","
            << escapeCsv(summary.subTotal) << ","
            << escapeCsv(summary.taxes) << ","
            << escapeCsv(summary.total);
@@ -27,11 +29,13 @@ string CFDIWritter::writeCsv(const CFDISummary& summary) {
 
 string CFDIWritter::writeJson(const CFDISummary& summary) {
     ostringstream stream;
-    stream << format(R"({{"date":"{}","description":"{}","issuerTaxCode":"{}","invoiceId":"{}","subTotal":"{}","taxes":"{}","total":"{}"}})",
+    stream << format(R"({{"date":"{}","description":"{}","issuerTaxCode":"{}","invoiceId":"{}","paymentMethod":"{}","placeOfIssue":"{}","subTotal":"{}","taxes":"{}","total":"{}"}})",
               escapeJson(summary.date),
               escapeJson(summary.description),
               escapeJson(summary.issuerTaxCode),
               escapeJson(summary.invoiceId),
+              escapeJson(summary.paymentMethod),
+              escapeJson(summary.placeOfIssue),
               escapeJson(summary.subTotal),
               escapeJson(summary.taxes),
               escapeJson(summary.total));
@@ -45,6 +49,8 @@ string CFDIWritter::writeXml(const CFDISummary& summary) {
            << "  <description>" << escapeXml(summary.description) << "</description>\n"
            << "  <issuerTaxCode>" << escapeXml(summary.issuerTaxCode) << "</issuerTaxCode>\n"
            << "  <invoiceId>" << escapeXml(summary.invoiceId) << "</invoiceId>\n"
+           << "  <paymentMethod>" << escapeXml(summary.paymentMethod) << "</paymentMethod>\n"
+           << "  <placeOfIssue>" << escapeXml(summary.placeOfIssue) << "</placeOfIssue>\n"
            << "  <subTotal>" << escapeXml(summary.subTotal) << "</subTotal>\n"
            << "  <taxes>" << escapeXml(summary.taxes) << "</taxes>\n"
            << "  <total>" << escapeXml(summary.total) << "</total>\n"

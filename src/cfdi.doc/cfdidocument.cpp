@@ -57,6 +57,8 @@ CFDISummary CFDIDocument::summarize() const {
         .description = join(_concepts, ", ", [](const CFDIConcept& c) { return c.description; }),
         .issuerTaxCode = _issuer.taxCode, 
         .invoiceId = _complement.stamp.uuid, 
+        .paymentMethod = _header.paymentMethod,
+        .placeOfIssue = _header.placeOfIssue,
         .subTotal = _header.subTotal, 
         .taxes = _taxes.total,
         .total = _header.total
