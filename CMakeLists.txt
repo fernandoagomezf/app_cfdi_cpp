@@ -55,6 +55,7 @@ add_library(CFDILib STATIC
     src/cfdi.doc/cfdistamp.ixx
     src/cfdi.doc/cfditransfer.ixx
     src/cfdi.doc/cfditax.ixx    
+    src/cfdi.doc/cfditax.cpp
     src/cfdi.doc/cfdiconcept.ixx
     src/cfdi.doc/cfdicomplement.ixx
     src/cfdi.doc/cfdisummary.ixx

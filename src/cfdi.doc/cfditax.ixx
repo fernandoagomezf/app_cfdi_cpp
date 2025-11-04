@@ -11,5 +11,6 @@ namespace cfdi {
     export struct CFDITax {             // cfdi:Impuesto
         string total;                   // cfdi:Impuesto - TotalImpuestosTrasladados
         list<CFDITransfer> transfers;   // cfdi:Impuesto / cfdi:Traslados
+        bool isExent() const;
     }; 
 }

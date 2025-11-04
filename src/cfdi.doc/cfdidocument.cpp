@@ -52,6 +52,7 @@ const CFDIComplement& CFDIDocument::complement() const {
 }
 
 CFDISummary CFDIDocument::summarize() const {
+    using namespace std::literals;
     return  { 
         .date = _header.date, 
         .description = join(_concepts, ", ", [](const CFDIConcept& c) { return c.description; }),
@@ -60,7 +61,7 @@ CFDISummary CFDIDocument::summarize() const {
         .paymentMethod = _header.paymentMethod,
         .placeOfIssue = _header.placeOfIssue,
         .subTotal = _header.subTotal, 
-        .taxes = _taxes.total,
+        .taxes = _taxes.isExent() ? "N/A"s : _taxes.total,
         .total = _header.total
     };
 }
