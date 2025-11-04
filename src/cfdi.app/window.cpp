@@ -257,9 +257,8 @@ void Window::onSave(wxCommandEvent& e) {
         }
         
         file.close();
-        
         SetStatusText(wxString::Format("Archivo exportado: %s", filePath));
-        
+        wxLaunchDefaultApplication(filePath);        
     } catch (const std::exception& ex) {
         wxMessageBox(wxString::Format("Error durante la exportación: %s", ex.what()), "Error", wxOK | wxICON_ERROR);
     }
