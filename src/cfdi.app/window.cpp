@@ -35,8 +35,7 @@ Window::Window()
     initToolBar();
     initGrid();
 
-    SetSize({ 1200, 700 });
-    Center();
+    Maximize();
 }
 
 void Window::initMenu() {
@@ -98,7 +97,7 @@ void Window::initGrid() {
     _grid->SetColLabelValue(9, wxString::FromUTF8("Total"));
     
     _grid->SetColSize(0, 120);
-    _grid->SetColSize(1, 250);
+    _grid->SetColSize(1, 350);
     _grid->SetColSize(2, 150);
     _grid->SetColSize(3, 250);
     _grid->SetColSize(4, 100);
