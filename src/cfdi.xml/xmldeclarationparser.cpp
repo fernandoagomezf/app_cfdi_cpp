@@ -6,6 +6,7 @@ import :xmlfragmentparser;
 import :xmlnode;
 import :xmldeclarationparser;
 
+using std::move;
 using std::runtime_error;
 using std::string;
 using cfdi::XmlBuffer;
@@ -37,7 +38,7 @@ XmlNode XmlDeclarationParser::parse() {     // parse the section <?xml ... ?>
     XmlNode node { 
         .nodeType = XmlNodeType::XmlDeclaration,
         .name = "xml",
-        .attributes = attributes,
+        .attributes = move(attributes),
     };
 
     return node;

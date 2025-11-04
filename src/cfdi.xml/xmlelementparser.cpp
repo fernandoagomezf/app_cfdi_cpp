@@ -6,6 +6,7 @@ import :xmlfragmentparser;
 import :xmlnode;
 import :xmlelementparser;
 
+using std::move;
 using std::runtime_error;
 using std::string;
 using cfdi::XmlBuffer;
@@ -60,7 +61,7 @@ XmlNode XmlElementParser::parseElementStart(){
         .localName = localName,
         .prefix = prefix,
         .isEmpty = isEmpty,
-        .attributes = attributes,
+        .attributes = move(attributes),
     };
     
     return node;
