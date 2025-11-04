@@ -7,6 +7,7 @@ import std;
 import cfdi.doc;
 
 namespace cfdi {
+    using std::string;
     using std::vector;
 
     export class Window final : public wxFrame {

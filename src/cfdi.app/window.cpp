@@ -27,7 +27,7 @@ using cfdi::CFDIScanner;
 using cfdi::Window;
 
 Window::Window()
-    : wxFrame(nullptr, wxID_ANY, "Blendwerk Procesador de CFDI v0.1.1"), 
+    : wxFrame(nullptr, wxID_ANY, "Procesador de CFDI v0.1.2"), 
       _grid { nullptr }
 {
     initMenu();
@@ -141,7 +141,7 @@ void Window::onExit(wxCommandEvent& e) {
 }
 
 void Window::onAbout(wxCommandEvent& e) {
-    wxMessageBox(wxString::FromUTF8("Blendwerk Procesador de CFDI v0.1.1\n\nAplicación para procesar archivos CFDI y exportar resúmenes."), 
+    wxMessageBox(wxString::FromUTF8("Procesador de CFDI v0.1.2\n\nAplicación para procesar archivos CFDI y exportar resúmenes."), 
                  wxString::FromUTF8("Acerca de"), wxOK | wxICON_INFORMATION);
 }
 
