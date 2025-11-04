@@ -9,10 +9,12 @@ namespace cfdi {
 
     export struct CFDISummary {
         string date;
+        string issuerName;
         string description;
         string issuerTaxCode;
         string invoiceId;
         string paymentMethod;
+        string paymentType;
         string placeOfIssue;
         string subTotal;
         string taxes;

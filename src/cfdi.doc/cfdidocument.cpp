@@ -51,14 +51,21 @@ const CFDIComplement& CFDIDocument::complement() const {
     return _complement;
 }
 
+string CFDIDocument::conceptSummary() const {
+    auto str { join(_concepts, ", ", [](const CFDIConcept& c) { return c.description; }) };
+    return str;
+}
+
 CFDISummary CFDIDocument::summarize() const {
     using namespace std::literals;
     return  { 
         .date = _header.date, 
-        .description = join(_concepts, ", ", [](const CFDIConcept& c) { return c.description; }),
+        .issuerName = _issuer.name,
+        .description = conceptSummary(),
         .issuerTaxCode = _issuer.taxCode, 
         .invoiceId = _complement.stamp.uuid, 
         .paymentMethod = _header.paymentMethod,
+        .paymentType = _header.paymentType,
         .placeOfIssue = _header.placeOfIssue,
         .subTotal = _header.subTotal, 
         .taxes = _taxes.isExent() ? "N/A"s : _taxes.total,

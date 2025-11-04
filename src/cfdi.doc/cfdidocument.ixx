@@ -42,5 +42,7 @@ namespace cfdi {
             list<CFDIConcept> _concepts;    // cfdi:Conceptos
             CFDITax _taxes;                 // cfdi:Impuestos
             CFDIComplement _complement;     // cfdi:Complemento
+
+            string conceptSummary() const;
     };
 }

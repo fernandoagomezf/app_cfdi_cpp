@@ -16,10 +16,12 @@ using std::ostringstream;
 string CFDIWritter::writeCsv(const CFDISummary& summary) {
     ostringstream stream;
     stream << escapeCsv(summary.date) << ","
+           << escapeCsv(summary.issuerName) << ","
            << escapeCsv(summary.description) << ","
            << escapeCsv(summary.issuerTaxCode) << ","
            << escapeCsv(summary.invoiceId) << ","
            << escapeCsv(summary.paymentMethod) << ","
+           << escapeCsv(summary.paymentType) << ","
            << escapeCsv(summary.placeOfIssue) << ","
            << escapeCsv(summary.subTotal) << ","
            << escapeCsv(summary.taxes) << ","
@@ -29,16 +31,20 @@ string CFDIWritter::writeCsv(const CFDISummary& summary) {
 
 string CFDIWritter::writeJson(const CFDISummary& summary) {
     ostringstream stream;
-    stream << format(R"({{"date":"{}","description":"{}","issuerTaxCode":"{}","invoiceId":"{}","paymentMethod":"{}","placeOfIssue":"{}","subTotal":"{}","taxes":"{}","total":"{}"}})",
-              escapeJson(summary.date),
-              escapeJson(summary.description),
-              escapeJson(summary.issuerTaxCode),
-              escapeJson(summary.invoiceId),
-              escapeJson(summary.paymentMethod),
-              escapeJson(summary.placeOfIssue),
-              escapeJson(summary.subTotal),
-              escapeJson(summary.taxes),
-              escapeJson(summary.total));
+    stream << "{\n"
+           << "  \"date\": \"" << escapeJson(summary.date) << "\",\n"
+           << "  \"issuerName\": \"" << escapeJson(summary.issuerName) << "\",\n"
+           << "  \"description\": \"" << escapeJson(summary.description) << "\",\n"
+           << "  \"issuerTaxCode\": \"" << escapeJson(summary.issuerTaxCode) << "\",\n"
+           << "  \"invoiceId\": \"" << escapeJson(summary.invoiceId) << "\",\n"
+           << "  \"paymentMethod\": \"" << escapeJson(summary.paymentMethod) << "\",\n"
+           << "  \"paymentType\": \"" << escapeJson(summary.paymentType) << "\",\n"
+           << "  \"placeOfIssue\": \"" << escapeJson(summary.placeOfIssue) << "\",\n"
+           << "  \"subTotal\": \"" << escapeJson(summary.subTotal) << "\",\n"
+           << "  \"taxes\": \"" << escapeJson(summary.taxes) << "\",\n"
+           << "  \"total\": \"" << escapeJson(summary.total) << "\"\n"
+           << "}";
+
     return stream.str();
 }
 
@@ -46,10 +52,12 @@ string CFDIWritter::writeXml(const CFDISummary& summary) {
     ostringstream stream;
     stream << "<Summary>\n"
            << "  <date>" << escapeXml(summary.date) << "</date>\n"
+           << "  <issuerName>" << escapeXml(summary.issuerName) << "</issuerName>\n"
            << "  <description>" << escapeXml(summary.description) << "</description>\n"
            << "  <issuerTaxCode>" << escapeXml(summary.issuerTaxCode) << "</issuerTaxCode>\n"
            << "  <invoiceId>" << escapeXml(summary.invoiceId) << "</invoiceId>\n"
            << "  <paymentMethod>" << escapeXml(summary.paymentMethod) << "</paymentMethod>\n"
+           << "  <paymentType>" << escapeXml(summary.paymentType) << "</paymentType>\n"
            << "  <placeOfIssue>" << escapeXml(summary.placeOfIssue) << "</placeOfIssue>\n"
            << "  <subTotal>" << escapeXml(summary.subTotal) << "</subTotal>\n"
            << "  <taxes>" << escapeXml(summary.taxes) << "</taxes>\n"
