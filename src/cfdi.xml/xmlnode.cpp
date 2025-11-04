@@ -20,7 +20,7 @@ bool XmlNode::hasAttributes() const {
 string_view XmlNode::getAttribute(string_view name) const{
     string result { };
     
-    auto it = attributes.find( string { name });
+    auto it = attributes.find(string { name });
     if (it != attributes.end()) {
         result = it->second;
     }

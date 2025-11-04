@@ -72,7 +72,7 @@ CFDIDocument CFDIDocument::fromXml(string_view xml) {
     while (reader.read()) {
         XmlNode node { reader.current() };
         if (node.nodeType == XmlNodeType::Element) {
-            if (node.nodeType == XmlNodeType::Element && node.localName == "Comprobante") {
+            if (node.nodeType == XmlNodeType::Element && node.name == "cfdi:Comprobante") {
                 doc._header = {
                     .version = node.attributes["Version"],
                     .series = node.attributes["Serie"], 
@@ -91,13 +91,13 @@ CFDIDocument CFDIDocument::fromXml(string_view xml) {
                     .placeOfIssue = node.attributes["LugarExpedicion"],
                     .exporting = node.attributes["Exportacion"]
                 };
-            } else if (node.nodeType == XmlNodeType::Element && node.localName == "Emisor") {
+            } else if (node.nodeType == XmlNodeType::Element && node.name == "cfdi:Emisor") {
                 doc._issuer = {
                     .taxCode = node.attributes["Rfc"], 
                     .name = node.attributes["Nombre"], 
                     .taxRegime = node.attributes["RegimenFiscal"]
                 };
-            } else if (node.nodeType == XmlNodeType::Element && node.localName == "Receptor") {
+            } else if (node.nodeType == XmlNodeType::Element && node.name == "cfdi:Receptor") {
                 doc._receiver = {
                     .taxCode = node.attributes["Rfc"], 
                     .name = node.attributes["Nombre"], 
@@ -105,10 +105,10 @@ CFDIDocument CFDIDocument::fromXml(string_view xml) {
                     .taxRegime = node.attributes["RegimenFiscalReceptor"],
                     .usage = node.attributes["UsoCFDI"]
                 };
-            } else if (node.nodeType == XmlNodeType::Element && node.localName == "Conceptos") {
+            } else if (node.nodeType == XmlNodeType::Element && node.name == "cfdi:Conceptos") {
                 while (reader.read()) {
                     node = reader.current();
-                    if (node.nodeType == XmlNodeType::Element && node.localName == "Concepto") {
+                    if (node.nodeType == XmlNodeType::Element && node.name == "cfdi:Concepto") {
                         doc._concepts.push_back({
                             .code = node.attributes["ClaveProdServ"], 
                             .idNumber = node.attributes["NoIdentificacion"],
@@ -120,17 +120,17 @@ CFDIDocument CFDIDocument::fromXml(string_view xml) {
                             .amount = node.attributes["Importe"],
                             .impObject = node.attributes["ObjetoImp"]
                         });
-                    } else if (node.nodeType == XmlNodeType::EndElement && node.localName == "Conceptos"){
+                    } else if (node.nodeType == XmlNodeType::EndElement && node.name == "cfdi:Conceptos"){
                         break;
                     }
                 }
-            } else if (node.nodeType == XmlNodeType::Element && node.localName == "Impuestos") {
+            } else if (node.nodeType == XmlNodeType::Element && node.name == "cfdi:Impuestos") {
                 doc._taxes = {
                     .total = node.attributes["TotalImpuestosTrasladados"]
                 };
                 while (reader.read()) {
                     node = reader.current();
-                    if (node.nodeType == XmlNodeType::Element && node.localName == "Traslado"){
+                    if (node.nodeType == XmlNodeType::Element && node.name == "cfdi:Traslado"){
                         doc._taxes.transfers.push_back({
                             .base = node.attributes["Base"],
                             .code = node.attributes["Impuesto"],
@@ -138,14 +138,14 @@ CFDIDocument CFDIDocument::fromXml(string_view xml) {
                             .rate = node.attributes["TasaOCuota"],
                             .amount = node.attributes["Importe"]
                         });
-                    } else if (node.nodeType == XmlNodeType::EndElement && node.localName == "Impuestos") {
+                    } else if (node.nodeType == XmlNodeType::EndElement && node.name == "cfdi:Impuestos") {
                         break;
                     }
                 }
-            } else if (node.nodeType == XmlNodeType::Element && node.localName == "Complemento") {
+            } else if (node.nodeType == XmlNodeType::Element && node.name == "cfdi:Complemento") {
                 if (reader.read()) {
                     node = reader.current();
-                    if (node.nodeType == XmlNodeType::Element && node.localName == "TimbreFiscalDigital") {
+                    if (node.nodeType == XmlNodeType::Element && node.name == "tfd:TimbreFiscalDigital") {
                         doc._complement = {
                             .stamp = {
                                 .version = node.attributes["Version"],
