@@ -23,5 +23,7 @@ namespace cfdi {
         string receiptType;             // cfdi:Comprobante - TipoDeComprobante
         string placeOfIssue;            // cfdi:Comprobante - LugarExpedicion
         string exporting;               // cfdi:Comprobante - Exportacion
+
+        string shortDate() const;
     };
 }

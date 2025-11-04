@@ -50,6 +50,7 @@ add_library(CFDILib STATIC
     # cfdi.doc module
     src/cfdi.doc/cfdi.doc.ixx
     src/cfdi.doc/cfdiheader.ixx
+    src/cfdi.doc/cfdiheader.cpp
     src/cfdi.doc/cfdiissuer.ixx
     src/cfdi.doc/cfdireceiver.ixx
     src/cfdi.doc/cfdistamp.ixx

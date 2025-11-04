@@ -59,7 +59,7 @@ string CFDIDocument::conceptSummary() const {
 CFDISummary CFDIDocument::summarize() const {
     using namespace std::literals;
     return  { 
-        .date = _header.date, 
+        .date = _header.shortDate(), 
         .issuerName = _issuer.name,
         .description = conceptSummary(),
         .issuerTaxCode = _issuer.taxCode, 
